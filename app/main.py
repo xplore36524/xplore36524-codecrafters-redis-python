@@ -1,15 +1,23 @@
 import socket  # noqa: F401
 import threading
-
+from app.resp import resp_parser, resp_encoder
 def handle_client(connection):
     with connection:
         while True:
             data = connection.recv(1024)
             if not data:
                 break
-            print(f"Received data: {data}")      
-            connection.sendall(b"+PONG\r\n")
+            print(f"Received data: {data}")
 
+            decoded_data = resp_parser(data)
+            if decoded_data[0] == "PING":
+                response = "+PONG\r\n".encode()
+            elif decoded_data[0] == "ECHO" and len(decoded_data) > 1:
+                response = resp_encoder(decoded_data[1])
+            else:
+                response = resp_encoder("ERR")
+
+            connection.sendall(response)
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
