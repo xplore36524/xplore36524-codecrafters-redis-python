@@ -1,6 +1,7 @@
 import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder
+from app.utils import getter, setter
 def handle_client(connection):
     with connection:
         while True:
@@ -10,10 +11,19 @@ def handle_client(connection):
             print(f"Received data: {data}")
 
             decoded_data = resp_parser(data)
+            # PING
             if decoded_data[0] == "PING":
                 response = "+PONG\r\n".encode()
+            # ECHO
             elif decoded_data[0] == "ECHO" and len(decoded_data) > 1:
                 response = resp_encoder(decoded_data[1])
+            # GET
+            elif decoded_data[0] == "GET":
+                response = resp_encoder(getter(decoded_data[1]))
+            # SET
+            elif decoded_data[0] == "SET" and len(decoded_data) > 2:
+                setter(decoded_data[1], decoded_data[2])
+                response = "+OK\r\n".encode()
             else:
                 response = resp_encoder("ERR")
 
