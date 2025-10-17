@@ -14,7 +14,9 @@ def resp_parser(data):
     return []
 
 def resp_encoder(data):
-    if isinstance(data, list):
+    if data is None:
+        return b"$-1\r\n"
+    elif isinstance(data, list):
         return_string = "*"
         return_string += str(len(data)) + "\r\n"
         for item in data:

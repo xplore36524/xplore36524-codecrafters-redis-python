@@ -15,14 +15,15 @@ def handle_client(connection):
             if decoded_data[0] == "PING":
                 response = "+PONG\r\n".encode()
             # ECHO
-            elif decoded_data[0] == "ECHO" and len(decoded_data) > 1:
+            elif decoded_data[0].upper() == "ECHO" and len(decoded_data) > 1:
                 response = resp_encoder(decoded_data[1])
             # GET
-            elif decoded_data[0] == "GET":
+            elif decoded_data[0].upper() == "GET":
                 response = resp_encoder(getter(decoded_data[1]))
+                print(f"GET response: {response}")
             # SET
-            elif decoded_data[0] == "SET" and len(decoded_data) > 2:
-                setter(decoded_data[1], decoded_data[2])
+            elif decoded_data[0].upper() == "SET" and len(decoded_data) > 2:
+                setter(decoded_data[1:])
                 response = "+OK\r\n".encode()
             else:
                 response = resp_encoder("ERR")
