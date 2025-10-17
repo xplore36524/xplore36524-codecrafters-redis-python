@@ -7,6 +7,7 @@ def expire_key(key, expire_time):
         del store[key]
         
 store = {}
+store_list = {}
 def setter(info):
     """Sets the value for a given key in the in-memory store."""
     if len(info) == 2:
@@ -22,3 +23,12 @@ def setter(info):
 def getter(key):
     """Gets the value for a given key from the in-memory store."""
     return store.get(key)
+
+def rpush(info):
+    """Appends values to a list stored at key."""
+    key = info[0]
+    values = info[1:]
+    if key not in store_list:
+        store_list[key] = []
+    store_list[key].extend(values)
+    return len(store_list[key])

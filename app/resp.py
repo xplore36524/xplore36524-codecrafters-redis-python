@@ -29,3 +29,7 @@ def resp_encoder(data):
         return_string += str(len(data)) + "\r\n"
         return_string += data + "\r\n"
         return return_string.encode()
+    elif isinstance(data, int):
+        return_string = ":" + str(data) + "\r\n"
+        return return_string.encode()
+    return b"$-1\r\n"

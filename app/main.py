@@ -1,7 +1,7 @@
 import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder
-from app.utils import getter, setter
+from app.utils import getter, setter, rpush
 def handle_client(connection):
     with connection:
         while True:
@@ -25,6 +25,11 @@ def handle_client(connection):
             elif decoded_data[0].upper() == "SET" and len(decoded_data) > 2:
                 setter(decoded_data[1:])
                 response = "+OK\r\n".encode()
+            # RPUSH
+            elif decoded_data[0].upper() == "RPUSH" and len(decoded_data) > 2:
+                # For simplicity, we treat RPUSH similar to SET in this implementation
+                size = rpush(decoded_data[1:])
+                response = resp_encoder(size)
             else:
                 response = resp_encoder("ERR")
 
