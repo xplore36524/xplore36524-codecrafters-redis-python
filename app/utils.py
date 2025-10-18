@@ -139,3 +139,12 @@ def blpop(info, connection, blocked):
 #####################    END LIST OPERATIONS     #####################
 
 #####################    STREAM OPERATIONS     #####################
+
+def type_getter(key):
+    """Returns the type of the value stored at key."""
+    if key in store:
+        return "string"
+    elif key in store_list:
+        return "list"
+    else:
+        return "none"

@@ -1,7 +1,7 @@
 import socket  # noqa: F401
 import threading
-from app.resp import resp_parser, resp_encoder
-from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop
+from app.resp import resp_parser, resp_encoder, simple_string_encoder
+from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter
 
 blocked = {}
 def handle_client(connection):
@@ -15,7 +15,7 @@ def handle_client(connection):
             decoded_data = resp_parser(data)
             # PING
             if decoded_data[0] == "PING":
-                response = "+PONG\r\n".encode()
+                response = simple_string_encoder("PONG")
                 connection.sendall(response)
             # ECHO
             elif decoded_data[0].upper() == "ECHO" and len(decoded_data) > 1:
@@ -63,6 +63,10 @@ def handle_client(connection):
                 else:
                     response = resp_encoder(response)
                     connection.sendall(response)
+            # TYPE
+            elif decoded_data[0].upper() == "TYPE" and len(decoded_data) > 1:
+                response = simple_string_encoder(type_getter(decoded_data[1]))
+                connection.sendall(response)
             else:
                 response = resp_encoder("ERR")
                 connection.sendall(response)

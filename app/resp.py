@@ -33,3 +33,6 @@ def resp_encoder(data):
         return_string = ":" + str(data) + "\r\n"
         return return_string.encode()
     return b"$-1\r\n"
+
+def simple_string_encoder(message):
+    return f"+{message}\r\n".encode()
