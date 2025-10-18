@@ -46,3 +46,13 @@ def lrange(info):
     else:
         end += 1
     return store_list[key][start:min(end, len(store_list[key]))] if end is not None else store_list[key][end]
+
+def lpush(info):
+    """Prepends values to a list stored at key."""
+    key = info[0]
+    values = info[1:]
+    if key not in store_list:
+        store_list[key] = []
+    for value in values:
+        store_list[key].insert(0, value)
+    return len(store_list[key])
