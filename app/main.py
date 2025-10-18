@@ -1,7 +1,7 @@
 import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder
-from app.utils import getter, setter, rpush, lrange, lpush, llen
+from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop
 def handle_client(connection):
     with connection:
         while True:
@@ -41,6 +41,9 @@ def handle_client(connection):
             elif decoded_data[0].upper() == "LLEN" and len(decoded_data) > 1:
                 size = llen(decoded_data[1])
                 response = resp_encoder(size)
+            # LPOP
+            elif decoded_data[0].upper() == "LPOP" and len(decoded_data) > 1:
+                response = resp_encoder(lpop(decoded_data[1]))
             else:
                 response = resp_encoder("ERR")
 

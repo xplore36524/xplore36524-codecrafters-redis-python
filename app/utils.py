@@ -62,3 +62,9 @@ def llen(key):
     if key in store_list:
         return len(store_list[key])
     return 0
+
+def lpop(key):
+    """Removes and returns the first element of the list stored at key."""
+    if key in store_list and store_list[key]:
+        return store_list[key].pop(0)
+    return None
