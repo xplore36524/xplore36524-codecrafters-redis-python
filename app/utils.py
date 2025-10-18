@@ -56,3 +56,9 @@ def lpush(info):
     for value in values:
         store_list[key].insert(0, value)
     return len(store_list[key])
+
+def llen(key):
+    """Returns the length of the list stored at key."""
+    if key in store_list:
+        return len(store_list[key])
+    return 0
