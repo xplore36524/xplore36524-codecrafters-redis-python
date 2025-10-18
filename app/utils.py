@@ -32,3 +32,17 @@ def rpush(info):
         store_list[key] = []
     store_list[key].extend(values)
     return len(store_list[key])
+
+def lrange(info):
+    """Returns a range of elements from a list stored at key."""
+    key = info[0]
+    start = int(info[1])
+    end = int(info[2])
+    if key not in store_list or start >= len(store_list[key]) or start > end:
+        return []
+    # Adjust end for Python's slicing
+    if end == -1:
+        end = None
+    else:
+        end += 1
+    return store_list[key][start:min(end, len(store_list[key]))] if end is not None else store_list[key][end]
