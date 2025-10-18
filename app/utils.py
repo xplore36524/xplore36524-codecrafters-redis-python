@@ -99,15 +99,41 @@ def lpop(info):
         return []
 
 def blpop(info, connection, blocked):
-    """Removes and returns the first element of the list stored at key."""
+    """
+    BLPOP with timeout support.
+    info: [key, timeout_in_seconds]
+    """
     key = info[0]
+    timeout = float(info[1])  # in seconds
+
+    # If the list already has elements, pop immediately
     if key in store_list and len(store_list[key]) > 0:
         return [key, store_list[key].pop(0)]
-    else:
-        if key not in blocked:
-            blocked[key] = []
+
+    # Otherwise, block this connection
+    if key not in blocked:
+        blocked[key] = []
     blocked[key].append(connection)
+
+    # If timeout > 0, schedule a timer to unblock the client after timeout
+    if timeout > 0:
+        def timeout_unblock():
+            time.sleep(timeout)
+            # Connection might have been unblocked by an RPUSH before timeout
+            if key in blocked and connection in blocked[key]:
+                blocked[key].remove(connection)
+                try:
+                    # Send RESP null array to indicate timeout: "*-1\r\n"
+                    connection.sendall(b"*-1\r\n")
+                except:
+                    pass  # client may have disconnected
+
+        # Run timer in a daemon thread
+        threading.Thread(target=timeout_unblock, daemon=True).start()
+
+    # Return None to indicate client is blocked for now
     return None
+
 
 
 #####################    END LIST OPERATIONS     #####################
