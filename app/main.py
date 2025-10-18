@@ -43,7 +43,7 @@ def handle_client(connection):
                 response = resp_encoder(size)
             # LPOP
             elif decoded_data[0].upper() == "LPOP" and len(decoded_data) > 1:
-                response = resp_encoder(lpop(decoded_data[1]))
+                response = resp_encoder(lpop(decoded_data[1:]))
             else:
                 response = resp_encoder("ERR")
 
