@@ -38,11 +38,11 @@ def lrange(info):
     key = info[0]
     start = int(info[1])
     end = int(info[2])
-    if key not in store_list or start >= len(store_list[key]) or start > end:
-        return []
     # Adjust end for Python's slicing
-    if end == -1:
-        end = None
+    if end < 0:
+        end = len(store_list[key]) + end
+    if key not in store_list or start >= len(store_list[key]) or (end > 0 and end < start):
+        return []
     else:
         end += 1
     return store_list[key][start:min(end, len(store_list[key]))] if end is not None else store_list[key][end]
