@@ -134,13 +134,7 @@ def blpop(info, connection, blocked):
     # Return None to indicate client is blocked for now
     return None
 
-
-
-#####################    END LIST OPERATIONS     #####################
-
-#####################    STREAM OPERATIONS     #####################
-
-def type_getter(key):
+def type_getter_lists(key):
     """Returns the type of the value stored at key."""
     if key in store:
         return "string"
@@ -148,3 +142,5 @@ def type_getter(key):
         return "list"
     else:
         return "none"
+
+#####################    END LIST OPERATIONS     #####################

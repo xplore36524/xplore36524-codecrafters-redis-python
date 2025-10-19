@@ -1,7 +1,8 @@
 import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder, simple_string_encoder
-from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter
+from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists
+from app.utils2 import xadd, type_getter_streams
 
 blocked = {}
 def handle_client(connection):
@@ -65,7 +66,19 @@ def handle_client(connection):
                     connection.sendall(response)
             # TYPE
             elif decoded_data[0].upper() == "TYPE" and len(decoded_data) > 1:
-                response = simple_string_encoder(type_getter(decoded_data[1]))
+                response = type_getter_lists(decoded_data[1])
+                print(f"TYPE response: {response}")
+                if response == "none": 
+                    response2 = simple_string_encoder(type_getter_streams(decoded_data[1]))
+                    connection.sendall(response2)
+                else:
+                    response = simple_string_encoder(response)
+                    connection.sendall(response)
+
+            # XADD 
+            elif decoded_data[0].upper() == "XADD" and len(decoded_data) > 4:      
+                result = xadd(decoded_data[1:])
+                response = resp_encoder(result)
                 connection.sendall(response)
             else:
                 response = resp_encoder("ERR")
