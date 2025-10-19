@@ -143,4 +143,11 @@ def type_getter_lists(key):
     else:
         return "none"
 
+def increment(key):
+    if key not in store:
+        store[key] = 0
+    ans = int(store[key])
+    ans += 1
+    store[key] = ans
+    return ans
 #####################    END LIST OPERATIONS     #####################

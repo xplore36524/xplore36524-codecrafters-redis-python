@@ -1,7 +1,7 @@
 import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder
-from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists
+from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 
 blocked = {}
@@ -103,6 +103,11 @@ def handle_client(connection):
                     result = xread(decoded_data[2:])
                     response = resp_encoder(result)
                     connection.sendall(response)
+            # INCR
+            elif decoded_data[0].upper() == "INCR" and len(decoded_data) > 1:
+                response = resp_encoder(increment(decoded_data[1]))
+                connection.sendall(response)
+
             # ERR
             else:
                 response = error_encoder("ERR")
