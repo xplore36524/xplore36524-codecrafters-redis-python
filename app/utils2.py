@@ -108,29 +108,52 @@ def xrange(info):
     return result
 
 def xread(info):
-    key = info[0]
-    id = info[1]
+    # [0 ...len(info)/2] are keys
+    # [len(info)/2 ...len(info)] are ids
+    keys = info[0:len(info) // 2]
+    ids = info[len(info) // 2:]
 
-    if '-' not in id:
-        id += '-0'
+    for id in ids:
+        if '-' not in id:
+            id += '-0'
 
-    if key not in streams:
-        return []
     result = []
-    for entry in streams[key]:
-        temp = [key]
-        result2 = []
-        entry_id = entry["id"]
-        if entry_id > id:
-            temp2 = [entry_id]
-            for field, value in entry.items():
-                if field != "id":
-                    temp2.append([field, value])
-            result2.append(temp2)
-            temp.append(result2)
-
-            result.append(temp)
+    for key,id in zip(keys, ids):
+        if key not in streams:
+            continue
+        for entry in streams[key]:
+            temp = [key]
+            result2 = []
+            entry_id = entry["id"]
+            if entry_id >= id:
+                temp2 = [entry_id]
+                for field, value in entry.items():
+                    if field != "id":
+                        temp2.append([field, value])
+                result2.append(temp2)
+                temp.append(result2)
+                
+                result.append(temp)
+        
     return result
+
+    # if key not in streams:
+    #     return []
+    # result = []
+    # for entry in streams[key]:
+    #     temp = [key]
+    #     result2 = []
+    #     entry_id = entry["id"]
+    #     if entry_id > id:
+    #         temp2 = [entry_id]
+    #         for field, value in entry.items():
+    #             if field != "id":
+    #                 temp2.append([field, value])
+    #         result2.append(temp2)
+    #         temp.append(result2)
+
+    #         result.append(temp)
+    # return result
 
 def type_getter_streams(key):
     """Returns the type of the value stored at key."""
