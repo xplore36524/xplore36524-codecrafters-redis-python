@@ -1,6 +1,6 @@
 import socket  # noqa: F401
 import threading
-from app.resp import resp_parser, resp_encoder, simple_string_encoder
+from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists
 from app.utils2 import xadd, type_getter_streams
 
@@ -78,10 +78,15 @@ def handle_client(connection):
             # XADD 
             elif decoded_data[0].upper() == "XADD" and len(decoded_data) > 4:      
                 result = xadd(decoded_data[1:])
-                response = resp_encoder(result)
-                connection.sendall(response)
+                print(f"XADD result: {result}")
+                if result[0] == "id":
+                    response = resp_encoder(result[1])
+                    connection.sendall(response)
+                else:
+                    response = error_encoder(result[1])
+                    connection.sendall(response)
             else:
-                response = resp_encoder("ERR")
+                response = error_encoder("ERR")
                 connection.sendall(response)
 
 def main():

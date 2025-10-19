@@ -36,3 +36,6 @@ def resp_encoder(data):
 
 def simple_string_encoder(message):
     return f"+{message}\r\n".encode()
+
+def error_encoder(message):
+    return f"-{message}\r\n".encode()
