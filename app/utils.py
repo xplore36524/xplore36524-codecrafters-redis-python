@@ -147,6 +147,9 @@ def increment(key):
     if key not in store:
         store[key] = "1"
         return 1
+    # check if not int
+    if not int(store[key]).isdigit():
+        return -1
     ans = int(store[key])
     ans += 1
     store[key] = str(ans)
