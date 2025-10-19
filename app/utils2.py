@@ -83,9 +83,13 @@ def xrange(info):
 
     if '-' not in start_id:
         start_id += '-0'
-    if '-' not in end_id:
+    elif start_id == '-':
+        start_id += '0-0'
+    if end_id == '+':
+        end_id = "9999999999-9999999999"
+    elif '-' not in end_id:
         end_id += '-9999999999'  # A large number to represent the maximum sequence
-    # print(f"XRange called with key: {key}, start_id: {start_id}, end_id: {end_id}")
+    print(f"XRange called with key: {key}, start_id: {start_id}, end_id: {end_id}")
 
     if key not in streams:
         return []
