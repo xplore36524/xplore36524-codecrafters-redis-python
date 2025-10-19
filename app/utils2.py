@@ -2,6 +2,9 @@
 
 #####################    STREAM OPERATIONS     #####################
 streams={}
+from app.resp import resp_encoder
+import threading
+import time
 
 def checker(key, id_time, id_sequence):
     """Checks if the provided id_time and id_sequence are valid integers."""
@@ -40,7 +43,7 @@ def allot(key, id_time):
             new_sequence = int(1)
     return f"{new_time}-{new_sequence}"
 
-def xadd(info):
+def xadd(info, blocked_xread):
     """Adds an entry to a stream."""
     key = info[0]
     id = info[1]
@@ -72,6 +75,30 @@ def xadd(info):
         entry[field] = value
 
     streams[key].append(entry)
+    if key in blocked_xread and blocked_xread[key]:
+        pending = blocked_xread[key][:]
+        print(pending)
+        blocked_xread[key] = []
+        for conn, last_id in pending:
+            result = []
+            for entry in streams[key]:
+                temp = [key]
+                result2 = []
+                entry_id = entry["id"]
+                if entry_id > last_id:
+                    temp2 = [entry_id]
+                    for field, value in entry.items():
+                        if field != "id":
+                            temp2.append([field, value])
+                    result2.append(temp2)
+                    temp.append(result2)
+                    result.append(temp)
+            response = resp_encoder(result)
+            try:
+                conn.sendall(response)
+            except:
+                pass
+            
     return "id", id  # In a real Redis implementation, this would be the entry ID  
 
 def xrange(info):
@@ -125,35 +152,52 @@ def xread(info):
             temp = [key]
             result2 = []
             entry_id = entry["id"]
-            if entry_id >= id:
+            if entry_id > id:
                 temp2 = [entry_id]
                 for field, value in entry.items():
                     if field != "id":
                         temp2.append([field, value])
                 result2.append(temp2)
                 temp.append(result2)
-                
+
                 result.append(temp)
         
     return result
 
-    # if key not in streams:
-    #     return []
-    # result = []
-    # for entry in streams[key]:
-    #     temp = [key]
-    #     result2 = []
-    #     entry_id = entry["id"]
-    #     if entry_id > id:
-    #         temp2 = [entry_id]
-    #         for field, value in entry.items():
-    #             if field != "id":
-    #                 temp2.append([field, value])
-    #         result2.append(temp2)
-    #         temp.append(result2)
+def blocks_xread(info, connection, blocked_xread):
+    res = xread(info[2:])
+    if res != []:
+        return res
+    timeout = float(info[0])  # in milliseconds
+    timeout = timeout / 1000  # in seconds
+    key = info[2]
+    id = info[3]
 
-    #         result.append(temp)
-    # return result
+    if key not in blocked_xread:
+        blocked_xread[key] = []
+    blocked_xread[key].append((connection, id))
+    print(f"Blocked xread for key: {key}, id: {id}")
+
+    def timeout_unblock():
+        time.sleep(timeout)
+        # If still blocked after timeout, send null array
+        if key in blocked_xread:
+            for conn, _ in blocked_xread[key]:
+                if conn == connection:
+                    try:
+                        conn.sendall(b"*-1\r\n")   # *-1\r\n
+                    except:
+                        pass
+                    blocked_xread[key].remove((conn, _))
+                    if not blocked_xread[key]:
+                        del blocked_xread[key]
+                    break
+
+    # Spawn a timeout thread
+    if timeout > 0:
+        threading.Thread(target=timeout_unblock, daemon=True).start()
+    
+    return None
 
 def type_getter_streams(key):
     """Returns the type of the value stored at key."""

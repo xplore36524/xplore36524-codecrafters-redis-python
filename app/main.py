@@ -2,9 +2,10 @@ import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists
-from app.utils2 import xadd, type_getter_streams, xrange, xread
+from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 
 blocked = {}
+blocked_xread = {}
 def handle_client(connection):
     with connection:
         while True:
@@ -77,7 +78,7 @@ def handle_client(connection):
 
             # XADD 
             elif decoded_data[0].upper() == "XADD" and len(decoded_data) > 4:      
-                result = xadd(decoded_data[1:])
+                result = xadd(decoded_data[1:], blocked_xread)
                 print(f"XADD result: {result}")
                 if result[0] == "id":
                     response = resp_encoder(result[1])
@@ -93,9 +94,15 @@ def handle_client(connection):
                 connection.sendall(response)
             # XREAD STREAMS
             elif decoded_data[0].upper() == "XREAD" and len(decoded_data) >= 4:
-                result = xread(decoded_data[2:])
-                response = resp_encoder(result)
-                connection.sendall(response)
+                if decoded_data[1].upper() == "BLOCK":
+                    result = blocks_xread(decoded_data[2:], connection, blocked_xread)
+                    if result is None:
+                        continue
+                    # response = resp_encoder(result)
+                else: 
+                    result = xread(decoded_data[2:])
+                    response = resp_encoder(result)
+                    connection.sendall(response)
             # ERR
             else:
                 response = error_encoder("ERR")
