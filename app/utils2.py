@@ -55,7 +55,11 @@ def xadd(info):
             if check != "ok":
                 return "err", check
     else:
-        pass
+        # allot id as 'current unix time in milliseconds'-'0'
+        import time
+        current_millis = int(time.time() * 1000)
+        time_allot = allot(key, str(current_millis))
+        id = time_allot
     field_values = info[2:]
 
     if key not in streams:
