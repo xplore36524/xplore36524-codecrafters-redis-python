@@ -74,6 +74,35 @@ def xadd(info):
     streams[key].append(entry)
     return "id", id  # In a real Redis implementation, this would be the entry ID  
 
+def xrange(info):
+    """Returns a range of entries from a stream."""
+    # print(f"xrange called with info: {info}")
+    key = info[0]
+    start_id = info[1]
+    end_id = info[2]
+
+    if '-' not in start_id:
+        start_id += '-0'
+    if '-' not in end_id:
+        end_id += '-9999999999'  # A large number to represent the maximum sequence
+    # print(f"XRange called with key: {key}, start_id: {start_id}, end_id: {end_id}")
+
+    if key not in streams:
+        return []
+
+    result = []
+    for entry in streams[key]:
+        entry_id = entry["id"]
+        # print(f"Comparing entry_id: {entry_id} with range {start_id} to {end_id}")
+        if entry_id >= start_id and entry_id <= end_id:
+            temp = [entry_id]
+            for field, value in entry.items():
+                if field != "id":
+                    temp.append([field, value])
+            result.append(temp)
+    print(f"XRange result: {result}")
+    return result
+
 def type_getter_streams(key):
     """Returns the type of the value stored at key."""
     if key in streams:

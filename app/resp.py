@@ -17,13 +17,10 @@ def resp_encoder(data):
     if data is None:
         return b"$-1\r\n"
     elif isinstance(data, list):
-        return_string = "*"
-        return_string += str(len(data)) + "\r\n"
+        out = f"*{len(data)}\r\n".encode()
         for item in data:
-            return_string += "$"
-            return_string += str(len(item)) + "\r\n"
-            return_string += item + "\r\n"
-        return return_string.encode()
+            out += resp_encoder(item)
+        return out
     elif isinstance(data, str):
         return_string = "$"
         return_string += str(len(data)) + "\r\n"

@@ -2,7 +2,7 @@ import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists
-from app.utils2 import xadd, type_getter_streams
+from app.utils2 import xadd, type_getter_streams, xrange
 
 blocked = {}
 def handle_client(connection):
@@ -85,6 +85,13 @@ def handle_client(connection):
                 else:
                     response = error_encoder(result[1])
                     connection.sendall(response)
+            # XRANGE
+            elif decoded_data[0].upper() == "XRANGE" and len(decoded_data) >= 4:
+                # print(f"XRANGE called with data: {decoded_data}")
+                result = xrange(decoded_data[1:])
+                response = resp_encoder(result)
+                connection.sendall(response)
+            # ERR
             else:
                 response = error_encoder("ERR")
                 connection.sendall(response)
