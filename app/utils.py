@@ -148,10 +148,11 @@ def increment(key):
         store[key] = "1"
         return 1
     # check if not int
-    if not int(store[key]).isdigit():
+    try:
+        ans = int(store[key])
+        ans += 1
+        store[key] = str(ans)
+        return ans
+    except:
         return -1
-    ans = int(store[key])
-    ans += 1
-    store[key] = str(ans)
-    return ans
 #####################    END LIST OPERATIONS     #####################

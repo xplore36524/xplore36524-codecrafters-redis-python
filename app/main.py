@@ -108,7 +108,8 @@ def handle_client(connection):
                 response = increment(decoded_data[1])
                 if response == -1:
                     response = error_encoder("ERR value is not an integer or out of range")
-                response = resp_encoder(response)
+                else:
+                    response = resp_encoder(response)
                 connection.sendall(response)
 
             # ERR
