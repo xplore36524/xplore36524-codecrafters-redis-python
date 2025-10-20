@@ -1,7 +1,7 @@
 import socket
 import threading
 from app.handler import handle_client
-from app.resp import resp_parser
+from app.resp import resp_encoder
 
 class Master():
     def __init__(self, args):
@@ -40,7 +40,7 @@ class Slave():
         # connect to master
         self.master_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.master_socket.connect((self.config['master_host'], self.config['master_port']))
-        self.master_socket.sendall(resp_parser(['PING']))
+        self.master_socket.sendall(resp_encoder(["PING"]))
 
 
         while True:
