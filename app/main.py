@@ -6,9 +6,9 @@ from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, t
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 from app.classes import Master, Slave
 
-blocked = {}
-blocked_xread = {}
-queue = []
+# blocked = {}
+# blocked_xread = {}
+# queue = []
 
 # def cmd_executor(decoded_data, connection, config, queued, executing):
 #     # PING

@@ -4,7 +4,6 @@ import argparse
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
-from app.classes import Master, Slave
 
 blocked = {}
 blocked_xread = {}
