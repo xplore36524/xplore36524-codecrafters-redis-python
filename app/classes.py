@@ -43,8 +43,8 @@ class Slave():
         self.master_socket.connect((self.config['master_host'], self.config['master_port']))
         self.master_socket.sendall(resp_encoder(["PING"]))
 
-        # # REPLCONF
-        # self.master_socket.sendall(resp_encoder(["REPLCONF", "listening-port", self.args.port]))
+        # REPLCONF
+        self.master_socket.sendall(resp_encoder(["REPLCONF", "listening-port", self.args.port]))
         # self.master_socket.sendall(resp_encoder(["REPLCONF", "capa", "psync2"]))
 
         while True:
