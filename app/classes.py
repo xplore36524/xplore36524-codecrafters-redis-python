@@ -43,9 +43,16 @@ class Slave():
         self.master_socket.connect((self.config['master_host'], self.config['master_port']))
         self.master_socket.sendall(resp_encoder(["PING"]))
 
+        # Read response from master
+        data = self.master_socket.recv(1024)
+        # assert data == "+PONG\r\n"
+        # print(data)
+
         # REPLCONF
-        self.master_socket.sendall(resp_encoder(["REPLCONF", "listening-port", self.args.port]))
-        # self.master_socket.sendall(resp_encoder(["REPLCONF", "capa", "psync2"]))
+        self.master_socket.sendall(resp_encoder(["REPLCONF", "listening-port", str(self.args.port)]))
+        data = self.master_socket.recv(1024)
+        self.master_socket.sendall(resp_encoder(["REPLCONF", "capa", "psync2"]))
+        data = self.master_socket.recv(1024)
 
         while True:
             client_socket, _ = server_socket.accept()
