@@ -124,6 +124,7 @@ def handle_client(connection):
                 if queued == True:
                     if len(queue) == 0:
                         response = resp_encoder([])
+                        print(f"EXEC response: {response}")
                         connection.sendall(response)
                         continue
                     queued = False
