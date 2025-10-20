@@ -18,7 +18,11 @@ def handle_client(connection):
 
             decoded_data = resp_parser(data)
             # PING
-            if decoded_data[0] == "PING":
+            if queued:
+                queue.append(decoded_data)
+                response = simple_string_encoder("QUEUED")
+                connection.sendall(response)
+            elif decoded_data[0] == "PING":
                 response = simple_string_encoder("PONG")
                 connection.sendall(response)
             # ECHO
@@ -123,10 +127,10 @@ def handle_client(connection):
             elif decoded_data[0].upper() == 'EXEC':
                 if queued == True:
                     queued = False
-                    print(f"EXEC queue: {queue}")
+                    # print(f"EXEC queue: {queue}")
                     if len(queue) == 0:
                         response = resp_encoder([])
-                        print(f"EXEC response: {response}")
+                        # print(f"EXEC response: {response}")
                         connection.sendall(response)
                         # continue
                     else:
