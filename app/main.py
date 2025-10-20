@@ -198,6 +198,17 @@ def cmd_executor(decoded_data, connection, queued, executing):
             response = error_encoder("ERR EXEC without MULTI")
             connection.sendall(response)
             return [],queued
+    # DISCARD
+    elif decoded_data[0].upper() == 'DISCARD':
+        if queued == True:
+            queued = False
+            response = simple_string_encoder("OK")
+            connection.sendall(response)
+            return [], queued
+        else:
+            response = error_encoder("ERR DISCARD without MULTI")
+            connection.sendall(response)
+            return [],queued
     # ERR
     else:
         response = error_encoder("ERR")
