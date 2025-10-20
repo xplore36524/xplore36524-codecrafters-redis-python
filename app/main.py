@@ -7,8 +7,8 @@ from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 blocked = {}
 blocked_xread = {}
 queue = []
-queued = False
 def handle_client(connection):
+    queued = False
     with connection:
         while True:
             data = connection.recv(1024)
