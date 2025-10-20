@@ -123,7 +123,7 @@ def handle_client(connection):
             elif decoded_data[0].upper() == 'EXEC':
                 if queued == True:
                     if len(queue) == 0:
-                        response = error_encoder([])
+                        response = resp_encoder([])
                         connection.sendall(response)
                         continue
                     queued = False
