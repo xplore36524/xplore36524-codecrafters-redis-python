@@ -121,7 +121,7 @@ def handle_client(connection):
                 connection.sendall(response)
             # EXEC
             elif decoded_data[0].upper() == 'EXEC':
-                if queued:
+                if queued == True:
                     queued = False
                     executor(queue)
                     # connection.sendall(response)
