@@ -7,7 +7,7 @@ blocked_xread = {}
 queue = []
 
 def cmd_executor(decoded_data, connection, config, queued, executing):
-    # PING
+    # EXEC Checker
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
         # append to last queue 
         queue[len(queue)-1].append(decoded_data)
@@ -16,6 +16,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         #     return response, queued
         connection.sendall(response)
         return [], queued
+    
+    # PING
     elif decoded_data[0] == "PING":
         response = simple_string_encoder("PONG")
         if executing:
@@ -232,6 +234,14 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         if executing:
             return response, queued
         print(f"INFO response: {response}")
+        connection.sendall(response)
+        return [], queued
+    
+    # REPLCONF
+    elif decoded_data[0].upper() == "REPLCONF":
+        response = simple_string_encoder("OK")
+        if executing:
+            return response, queued
         connection.sendall(response)
         return [], queued
 
