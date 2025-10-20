@@ -199,7 +199,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
                 q = queue.pop(0)
                 for cmd in q:
                     print(f"EXEC cmd: {cmd}")
-                    output, queued = cmd_executor(cmd, connection, queued, executing)
+                    output, queued = cmd_executor(cmd, connection, config, queued, executing)
                     result.append(output)
                     print(f"EXEC result: {result}")
                 # queue.clear()
