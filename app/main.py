@@ -192,7 +192,7 @@ def cmd_executor(decoded_data, connection, queued, executing):
                     output, queued = cmd_executor(cmd, connection, queued, executing)
                     result.append(output)
                     print(f"EXEC result: {result}")
-                queue.clear()
+                # queue.clear()
                 executing = False
                 response = array_encoder(result)
                 connection.sendall(response)
