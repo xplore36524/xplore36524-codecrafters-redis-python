@@ -1,9 +1,9 @@
 import socket
 import threading
+from app.handler import handle_client
 
 class Master():
     def __init__(self, args):
-        from app.main import handle_client
         self.slaves = {}
         self.args = args
         self.config = {}
@@ -21,7 +21,6 @@ class Master():
             client_thread.start()
 
 class Slave():
-    from app.main import handle_client
     def __init__(self, args):
         self.args = args
         self.config = {}
