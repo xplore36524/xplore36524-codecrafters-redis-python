@@ -122,13 +122,14 @@ def handle_client(connection):
             # EXEC
             elif decoded_data[0].upper() == 'EXEC':
                 if queued == True:
+                    queued = False
                     if len(queue) == 0:
                         response = resp_encoder([])
                         print(f"EXEC response: {response}")
                         connection.sendall(response)
-                        continue
-                    queued = False
-                    executor(queue)
+                        # continue
+                    else:
+                        executor(queue)
                     # connection.sendall(response)
                 else:
                     response = error_encoder("ERR EXEC without MULTI")
