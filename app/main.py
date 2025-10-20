@@ -11,7 +11,8 @@ queue = []
 def cmd_executor(decoded_data, connection, queued, executing):
     # PING
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
-        queue.append(decoded_data)
+        # append to last queue 
+        queue[len(queue)-1].append(decoded_data)
         response = simple_string_encoder("QUEUED")
         # if queued:
         #     return response, queued
@@ -167,6 +168,7 @@ def cmd_executor(decoded_data, connection, queued, executing):
     elif decoded_data[0].upper() == 'MULTI':
         # queue.append(decoded_data)
         queued = True
+        queue.append([])
         response = simple_string_encoder("OK")
         connection.sendall(response)
         return [], queued
@@ -184,7 +186,8 @@ def cmd_executor(decoded_data, connection, queued, executing):
             else:
                 executing = True
                 result = []
-                for cmd in queue:
+                q = queue.pop(0)
+                for cmd in q:
                     print(f"EXEC cmd: {cmd}")
                     output, queued = cmd_executor(cmd, connection, queued, executing)
                     result.append(output)
