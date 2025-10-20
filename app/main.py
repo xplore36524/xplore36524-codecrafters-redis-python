@@ -1,5 +1,6 @@
 import socket  # noqa: F401
 import threading
+import argparse
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
@@ -232,13 +233,12 @@ def handle_client(connection):
             decoded_data = resp_parser(data)
             _, queued = cmd_executor(decoded_data, connection, queued, executing)
 
-def main():
+def main(args):
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
-
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(("localhost", 6379))
+    server_socket.bind(("localhost", int(args.port)))
     server_socket.listen(10)
 
     while True:
@@ -247,6 +247,8 @@ def main():
         client_thread.daemon = True
         client_thread.start()
 
-
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default=6379)
+    args = parser.parse_args()
+    main(args)
