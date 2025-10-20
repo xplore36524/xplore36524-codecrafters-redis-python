@@ -1,6 +1,3 @@
-import socket  # noqa: F401
-import threading
-import argparse
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
@@ -228,9 +225,13 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 
     # INFO
     elif decoded_data[0].upper() == "INFO":
-        response = resp_encoder("role:"+config['role'])
+        response = "role:"+config['role']
+        if config['role'] == 'master':
+            response += f"\nmaster_replid:8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb\nmaster_repl_offset:{config['master_replid_offset']}"
+        response = resp_encoder(response)
         if executing:
             return response, queued
+        print(f"INFO response: {response}")
         connection.sendall(response)
         return [], queued
 
