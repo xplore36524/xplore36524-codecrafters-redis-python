@@ -6,6 +6,8 @@ from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 
 blocked = {}
 blocked_xread = {}
+queue = []
+queued = False
 def handle_client(connection):
     with connection:
         while True:
@@ -111,7 +113,12 @@ def handle_client(connection):
                 else:
                     response = resp_encoder(response)
                 connection.sendall(response)
-
+            # MULTI
+            elif decoded_data[0].upper() == 'MULTI':
+                queue.append(decoded_data)
+                queued = True
+                response = simple_string_encoder("OK")
+                connection.sendall(response)
             # ERR
             else:
                 response = error_encoder("ERR")
