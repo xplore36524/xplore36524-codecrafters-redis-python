@@ -1,7 +1,7 @@
 import socket  # noqa: F401
 import threading
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder
-from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
+from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment, executor
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 
 blocked = {}
@@ -119,6 +119,15 @@ def handle_client(connection):
                 queued = True
                 response = simple_string_encoder("OK")
                 connection.sendall(response)
+            # EXEC
+            elif decoded_data[0].upper() == 'EXEC':
+                if queued:
+                    queued = False
+                    executor(queue)
+                    # connection.sendall(response)
+                else:
+                    response = error_encoder("ERR EXEC without MULTI")
+                    connection.sendall(response)
             # ERR
             else:
                 response = error_encoder("ERR")
