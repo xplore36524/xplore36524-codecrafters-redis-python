@@ -54,6 +54,10 @@ class Slave():
         self.master_socket.sendall(resp_encoder(["REPLCONF", "capa", "psync2"]))
         data = self.master_socket.recv(1024)
 
+        # PSYNC
+        self.master_socket.sendall(resp_encoder(["PSYNC", '?', '-1']))
+        data = self.master_socket.recv(1024)
+
         while True:
             client_socket, _ = server_socket.accept()
             client_thread = threading.Thread(target=handle_client, args=(client_socket,self.config))

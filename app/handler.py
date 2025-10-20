@@ -245,6 +245,15 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         #     return response, queued
         connection.sendall(response)
         return [], queued
+    
+    # PSYNC
+    elif decoded_data[0].upper() == "PSYNC":
+        response = "FULLRESYNC " + config['master_replid'] + " " + str(config['master_replid_offset'])
+        response = simple_string_encoder(response)
+        # if executing:
+        #     return response, queued
+        connection.sendall(response)
+        return [], queued
 
     # ERR
     else:
