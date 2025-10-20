@@ -49,6 +49,9 @@ def cmd_executor(decoded_data, connection, queued, executing):
             return response, queued
         connection.sendall(response)
         return [], queued
+    
+    ############################## LISTS ##############################
+
     # RPUSH
     elif decoded_data[0].upper() == "RPUSH" and len(decoded_data) > 2:
         # For simplicity, we treat RPUSH similar to SET in this implementation
@@ -99,6 +102,9 @@ def cmd_executor(decoded_data, connection, queued, executing):
                 return response, queued
             connection.sendall(response)
         return [], queued
+    
+    ############################## STREAMS ##############################
+
     # TYPE
     elif decoded_data[0].upper() == "TYPE" and len(decoded_data) > 1:
         response = type_getter_lists(decoded_data[1])
@@ -154,6 +160,9 @@ def cmd_executor(decoded_data, connection, queued, executing):
             connection.sendall(response)
         
         return [], queued
+    
+    ########################## TRANSACTION ############################
+
     # INCR
     elif decoded_data[0].upper() == "INCR" and len(decoded_data) > 1:
         response = increment(decoded_data[1])
@@ -214,6 +223,17 @@ def cmd_executor(decoded_data, connection, queued, executing):
             response = error_encoder("ERR DISCARD without MULTI")
             connection.sendall(response)
             return [],queued
+
+    ############################### REPLCATION ##############################
+
+    # INFO
+    elif decoded_data[0].upper() == "INFO":
+        response = resp_encoder("role:master")
+        if executing:
+            return response, queued
+        connection.sendall(response)
+        return [], queued
+
     # ERR
     else:
         response = error_encoder("ERR")
