@@ -4,12 +4,13 @@ import argparse
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
+from app.classes import Master, Slave
 
 blocked = {}
 blocked_xread = {}
 queue = []
 
-def cmd_executor(decoded_data, connection, queued, executing):
+def cmd_executor(decoded_data, connection, config, queued, executing):
     # PING
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
         # append to last queue 
@@ -228,7 +229,7 @@ def cmd_executor(decoded_data, connection, queued, executing):
 
     # INFO
     elif decoded_data[0].upper() == "INFO":
-        response = resp_encoder("role:master")
+        response = resp_encoder(config['role'])
         if executing:
             return response, queued
         connection.sendall(response)
@@ -240,7 +241,7 @@ def cmd_executor(decoded_data, connection, queued, executing):
         connection.sendall(response)
         return [], queued
 
-def handle_client(connection):
+def handle_client(connection, config):
     queued = False
     executing = False
     with connection:
@@ -251,24 +252,20 @@ def handle_client(connection):
             print(f"Received data: {data}")
 
             decoded_data = resp_parser(data)
-            _, queued = cmd_executor(decoded_data, connection, queued, executing)
+            _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
 
 def main(args):
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(("localhost", int(args.port)))
-    server_socket.listen(10)
 
-    while True:
-        client_socket, _ = server_socket.accept()
-        client_thread = threading.Thread(target=handle_client, args=(client_socket,))
-        client_thread.daemon = True
-        client_thread.start()
+    if args.replicaof:
+        runner = Slave(args)
+    else:
+        runner = Master(args)     
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=6379)
+    parser.add_argument("--replicaof", type=str, default="")
     args = parser.parse_args()
     main(args)
