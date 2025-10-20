@@ -228,7 +228,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 
     # INFO
     elif decoded_data[0].upper() == "INFO":
-        response = resp_encoder(config['role'])
+        response = resp_encoder("role:"+config['role'])
         if executing:
             return response, queued
         connection.sendall(response)
