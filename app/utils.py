@@ -156,6 +156,6 @@ def increment(key):
     except:
         return -1
     
-def executer(info):
+def executor(info):
     pass
 #####################    END LIST OPERATIONS     #####################
