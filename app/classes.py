@@ -30,7 +30,7 @@ class Slave():
         self.config['role'] = 'slave'
         master_host, master_port = self.args.replicaof.split(' ')
         self.config['master_host'] = master_host
-        self.config['master_port'] = master_port
+        self.config['master_port'] = int(master_port)
 
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -38,9 +38,9 @@ class Slave():
         server_socket.listen(10)
 
         # connect to master
-        master_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        master_socket.connect((self.config['master_host'], int(self.config['master_port'])))
-        master_socket.send(resp_parser(['PING']))
+        self.master_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.master_socket.connect((self.config['master_host'], self.config['master_port']))
+        self.master_socket.sendall(resp_parser(['PING']))
 
 
         while True:
