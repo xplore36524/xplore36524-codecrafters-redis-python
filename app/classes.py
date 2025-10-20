@@ -37,11 +37,15 @@ class Slave():
         server_socket.bind(("localhost", int(self.args.port)))
         server_socket.listen(10)
 
+        ############################## HANDSHAKE WITH MASTER ##############################
         # connect to master
         self.master_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.master_socket.connect((self.config['master_host'], self.config['master_port']))
         self.master_socket.sendall(resp_encoder(["PING"]))
 
+        # REPLCONF
+        self.master_socket.sendall(resp_encoder(["REPLCONF", "listening-port", self.args.port]))
+        self.master_socket.sendall(resp_encoder(["REPLCONF", "capa", "psync2"]))
 
         while True:
             client_socket, _ = server_socket.accept()
