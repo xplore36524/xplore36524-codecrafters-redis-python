@@ -10,7 +10,7 @@ queue = []
 
 def cmd_executor(decoded_data, connection, queued, executing):
     # PING
-    if queued and decoded_data[0] != "EXEC":
+    if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
         queue.append(decoded_data)
         response = simple_string_encoder("QUEUED")
         # if queued:
@@ -202,6 +202,7 @@ def cmd_executor(decoded_data, connection, queued, executing):
     elif decoded_data[0].upper() == 'DISCARD':
         if queued == True:
             queued = False
+            queue.clear()
             response = simple_string_encoder("OK")
             connection.sendall(response)
             return [], queued
