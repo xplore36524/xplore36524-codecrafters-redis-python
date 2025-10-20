@@ -155,7 +155,4 @@ def increment(key):
         return ans
     except:
         return -1
-    
-def executor(info):
-    pass
 #####################    END LIST OPERATIONS     #####################

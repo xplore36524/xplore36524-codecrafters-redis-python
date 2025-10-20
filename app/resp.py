@@ -36,3 +36,17 @@ def simple_string_encoder(message):
 
 def error_encoder(message):
     return f"-{message}\r\n".encode()
+
+def array_encoder(data):
+    """
+    Takes a list of RESP-encoded byte strings (results)
+    and wraps them in a single RESP array.
+    """
+
+    # Build the RESP array header
+    merged = f"*{len(data)}\r\n".encode()
+
+    # Append all byte responses directly
+    for r in data:
+        merged += r
+    return merged
