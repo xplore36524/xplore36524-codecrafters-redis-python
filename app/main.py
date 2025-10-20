@@ -115,7 +115,7 @@ def handle_client(connection):
                 connection.sendall(response)
             # MULTI
             elif decoded_data[0].upper() == 'MULTI':
-                queue.append(decoded_data)
+                # queue.append(decoded_data)
                 queued = True
                 response = simple_string_encoder("OK")
                 connection.sendall(response)
@@ -123,6 +123,7 @@ def handle_client(connection):
             elif decoded_data[0].upper() == 'EXEC':
                 if queued == True:
                     queued = False
+                    print(f"EXEC queue: {queue}")
                     if len(queue) == 0:
                         response = resp_encoder([])
                         print(f"EXEC response: {response}")
