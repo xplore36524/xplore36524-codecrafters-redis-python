@@ -285,7 +285,14 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         connection.sendall(response)
         REPLICAS.append(connection)
         return [], queued
-
+    # WAIT 
+    elif decoded_data[0].upper() == "WAIT":
+        response = resp_encoder(0)
+        # if executing:
+        #     return response, queued
+        if config['role'] == 'master':
+            connection.sendall(response)
+        return [], queued
     # ERR
     else:
         response = error_encoder("ERR")
