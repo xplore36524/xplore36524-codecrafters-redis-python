@@ -1,4 +1,4 @@
-from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder
+from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 
@@ -26,7 +26,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         response = simple_string_encoder("PONG")
         if executing:
             return response, queued
-        connection.sendall(response)
+        if config['role'] == 'master':
+            connection.sendall(response)
         return [],queued
     # ECHO
     elif decoded_data[0].upper() == "ECHO" and len(decoded_data) > 1:
@@ -250,10 +251,16 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     
     # REPLCONF
     elif decoded_data[0].upper() == "REPLCONF":
-        response = simple_string_encoder("OK")
-        # if executing:
-        #     return response, queued
-        connection.sendall(response)
+        if decoded_data[1].upper() == "GETACK" and config['role'] == 'slave':
+            response = resp_encoder(["REPLCONF","ACK","0"])
+            # if executing:
+            #     return response, queued
+            connection.sendall(response)
+        else:
+            response = simple_string_encoder("OK")
+            # if executing:
+            #     return response, queued
+            connection.sendall(response)
         return [], queued
     
     # PSYNC
@@ -280,15 +287,51 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         connection.sendall(response)
         return [], queued
 
+# def handle_client(connection, config):
+#     queued = False
+#     executing = False
+#     with connection:
+#         while True:
+#             data = connection.recv(1024)
+#             if not data:
+#                 break
+#             print(f"Received data: {data}")
+
+#             decoded_data = resp_parser(data)
+#             _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
+
 def handle_client(connection, config):
     queued = False
     executing = False
     with connection:
         while True:
-            data = connection.recv(1024)
-            if not data:
+            chunk = connection.recv(1024)
+            if not chunk:
                 break
-            print(f"Received data: {data}")
 
-            decoded_data = resp_parser(data)
-            _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
+            print(f"Received chunk: {chunk}")
+
+            # Try to parse one or more complete RESP messages from buffer
+            messages = parse_all(chunk)
+            if not messages:
+                continue  # incomplete data, wait for more
+
+            for msg in messages:
+                try:
+                    # Convert bulk strings (bytes) to text
+                    decoded_data = [
+                        x.decode() if isinstance(x, (bytes, bytearray)) else x
+                        for x in msg
+                    ]
+
+                    print(f"Parsed command: {decoded_data}")
+
+                    if isinstance(decoded_data, str) and msg.startswith("REDIS"):
+                        continue
+
+                    _, queued = cmd_executor(
+                        decoded_data, connection, config, queued, executing
+                    )
+
+                except Exception as e:
+                    print(f"Error handling command {msg}: {e}")

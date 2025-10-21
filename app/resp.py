@@ -13,6 +13,43 @@ def resp_parser(data):
         return elements
     return []
 
+def parse_all(data):
+    """Parse as many complete RESP messages as possible from data."""
+    messages = []
+    buffer = data
+    while buffer:
+        try:
+            msg, buffer = parse_next(buffer)
+            messages.append(msg)
+        except Exception:
+            # Partial message or invalid data, keep buffer for next recv
+            break
+    print(f"Messages parsed: {messages}")
+    return messages
+
+def parse_next(data):
+    print(f"parse_next called with data: {data}")
+    first, data = data.split(b"\r\n", 1)
+    match first[:1]:
+        case b"*":
+            value = []
+            l = int(first[1:].decode())
+            for _ in range(l):
+                item, data = parse_next(data)
+                value.append(item)
+            return value, data
+        case b"$":
+            l = int(first[1:].decode())
+            blk = data[:l]
+            data = data[l + 2 :]
+            return blk, data
+
+        case b"+":
+            return first[1:].decode(), data
+
+        case _:
+            raise RuntimeError(f"Parse not implemented: {first[:1]}")
+
 def resp_encoder(data):
     if data is None:
         return b"$-1\r\n"

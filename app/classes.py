@@ -2,6 +2,7 @@ import socket
 import threading
 from app.handler import handle_client
 from app.resp import resp_encoder
+from time import sleep
 
 class Master():
     def __init__(self, args):
@@ -58,7 +59,11 @@ class Slave():
         self.master_socket.sendall(resp_encoder(["PSYNC", '?', '-1']))
         data = self.master_socket.recv(1024)
         print(f"[Replica] PSYNC response: {data}")
-
+        # sleep(2)
+        # RDB
+        # self.master_socket.sendall(resp_encoder(["RDB"]))
+        # data = self.master_socket.recv(1024)
+        # print(f"[Replica] RDB response: {data}")
         threading.Thread(
             target=handle_client,
             args=(self.master_socket, self.config),
