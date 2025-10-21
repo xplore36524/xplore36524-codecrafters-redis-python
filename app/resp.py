@@ -17,6 +17,9 @@ def parse_all(data):
     """Parse as many complete RESP messages as possible from data."""
     messages = []
     buffer = data
+    if b'FULLRESYNC' in data:
+        _, data = data.split(b"\r\n",1)
+        buffer = data
     while buffer:
         try:
             msg, buffer = parse_next(buffer)
@@ -29,8 +32,6 @@ def parse_all(data):
 
 def parse_next(data):
     print(f"parse_next called with data: {data}")
-    if b'FULLRESYNC' in data:
-        return parse_next(data.split(b"\r\n")[1:])
     first, data = data.split(b"\r\n", 1)
     match first[:1]:
         case b"*":
