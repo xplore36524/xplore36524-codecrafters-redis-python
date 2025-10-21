@@ -18,8 +18,7 @@ def parse_all(data):
     messages = []
     buffer = data
     if b'FULLRESYNC' in data:
-        _, data = data.split(b"\r\n",1)
-        buffer = data
+        _, buffer = data.split(b"\r\n",1)
     while buffer:
         try:
             msg, buffer = parse_next(buffer)
