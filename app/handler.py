@@ -320,7 +320,7 @@ def handle_client(connection, config, data = b""):
     with connection:
         while True:
             chunk = connection.recv(1024)
-            if not chunk:
+            if not chunk and not buffer:
                 break
             buffer += chunk
 
