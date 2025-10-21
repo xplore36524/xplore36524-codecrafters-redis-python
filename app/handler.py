@@ -287,7 +287,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         return [], queued
     # WAIT 
     elif decoded_data[0].upper() == "WAIT":
-        response = resp_encoder(0)
+        response = resp_encoder(len(REPLICAS))
         # if executing:
         #     return response, queued
         if config['role'] == 'master':
