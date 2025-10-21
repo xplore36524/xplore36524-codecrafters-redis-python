@@ -17,6 +17,7 @@ def setter(info):
     if len(info) == 2:
         key, value = info
         store[key] = value
+        print("store",store)
     elif info[2] == "PX":
         key, value, _, expire_time = info
         store[key] = value
@@ -26,6 +27,7 @@ def setter(info):
 
 def getter(key):
     """Gets the value for a given key from the in-memory store."""
+    print("store",store)
     return store.get(key)
 
 def rpush(info, blocked):

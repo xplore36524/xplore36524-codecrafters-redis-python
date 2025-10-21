@@ -37,6 +37,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         return [], queued
     # GET
     elif decoded_data[0].upper() == "GET":
+        print("role",config['role'])
         response = resp_encoder(getter(decoded_data[1]))
         print(f"GET response: {response}")
         if executing:
@@ -46,13 +47,17 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     # SET
     elif decoded_data[0].upper() == "SET" and len(decoded_data) > 2:
         print(f"SET data: {decoded_data}")
+        if config['role'] == 'master':
+            for replica in REPLICAS:
+                print(f"replica: {replica}")
+                replica.sendall(resp_encoder(decoded_data))
+        print("role",config['role'])
         setter(decoded_data[1:])
         response = "+OK\r\n".encode()
         if executing:
             return response, queued
-        connection.sendall(response)
-        for replica in REPLICAS:
-            replica.sendall(resp_encoder(decoded_data))
+        if config['role'] == 'master':
+            connection.sendall(response)
         return [], queued
     
     ############################## LISTS ##############################

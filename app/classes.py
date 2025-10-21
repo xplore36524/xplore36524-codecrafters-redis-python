@@ -57,6 +57,13 @@ class Slave():
         # PSYNC
         self.master_socket.sendall(resp_encoder(["PSYNC", '?', '-1']))
         data = self.master_socket.recv(1024)
+        print(f"[Replica] PSYNC response: {data}")
+
+        threading.Thread(
+            target=handle_client,
+            args=(self.master_socket, self.config),
+            daemon=True,
+        ).start()
 
         while True:
             client_socket, _ = server_socket.accept()
