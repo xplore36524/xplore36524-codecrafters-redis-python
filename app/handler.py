@@ -6,7 +6,7 @@ blocked = {}
 blocked_xread = {}
 queue = []
 REPLICAS = []
-BYTES = 0
+BYTES_READ = 0
 
 RDB_hex = '524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2'
 
@@ -49,7 +49,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     # SET
     elif decoded_data[0].upper() == "SET" and len(decoded_data) > 2:
         print(f"SET data: {decoded_data}")
-        BYTES += len(resp_encoder(decoded_data))
+        BYTES_READ += len(resp_encoder(decoded_data))
         if config['role'] == 'master':
             for replica in REPLICAS:
                 print(f"replica: {replica}")
@@ -254,8 +254,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     # REPLCONF
     elif decoded_data[0].upper() == "REPLCONF":
         if decoded_data[1].upper() == "GETACK" and config['role'] == 'slave':
-            response = resp_encoder(["REPLCONF","ACK",str(BYTES)])
-            BYTES += len(resp_encoder(decoded_data))
+            response = resp_encoder(["REPLCONF","ACK",str(BYTES_READ)])
+            BYTES_READ += len(resp_encoder(decoded_data))
             # if executing:
             #     return response, queued
             connection.sendall(response)
