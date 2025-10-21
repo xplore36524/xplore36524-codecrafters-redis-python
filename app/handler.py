@@ -25,6 +25,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     
     # PING
     elif decoded_data[0] == "PING":
+        BYTES_READ += len(resp_encoder(decoded_data))
         response = simple_string_encoder("PONG")
         if executing:
             return response, queued
@@ -305,6 +306,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 #             _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
 
 def handle_client(connection, config):
+    buffer = b""
     queued = False
     executing = False
     with connection:
@@ -312,11 +314,12 @@ def handle_client(connection, config):
             chunk = connection.recv(1024)
             if not chunk:
                 break
+            buffer += chunk
 
-            print(f"Received chunk: {chunk}")
+            print(f"Received chunk: {buffer}")
 
             # Try to parse one or more complete RESP messages from buffer
-            messages = parse_all(chunk)
+            messages = parse_all(buffer)
             if not messages:
                 continue  # incomplete data, wait for more
 
@@ -330,7 +333,7 @@ def handle_client(connection, config):
 
                     print(f"Parsed command: {decoded_data}")
 
-                    if isinstance(decoded_data, str) and msg.startswith("REDIS"):
+                    if decoded_data[0] == 82:
                         continue
 
                     _, queued = cmd_executor(
@@ -339,3 +342,6 @@ def handle_client(connection, config):
 
                 except Exception as e:
                     print(f"Error handling command {msg}: {e}")
+
+            buffer = b""  
+
