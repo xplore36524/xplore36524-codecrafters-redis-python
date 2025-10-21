@@ -341,7 +341,7 @@ def handle_client(connection, config, data = b""):
 
                     print(f"Parsed command: {decoded_data}")
 
-                    if decoded_data[0] == 82 or decoded_data[0] == "FULLRESYNC":
+                    if decoded_data[0] == 82 or decoded_data[0] == 'F':
                         continue
 
                     _, queued = cmd_executor(
