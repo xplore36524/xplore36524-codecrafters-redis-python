@@ -313,6 +313,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 #             _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
 
 def handle_client(connection, config, data = b""):
+    print(f"handle_client called with data: {data}")
     buffer = data
     queued = False
     executing = False
