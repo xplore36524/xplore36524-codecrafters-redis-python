@@ -59,7 +59,7 @@ class Slave():
         self.master_socket.sendall(resp_encoder(["PSYNC", '?', '-1']))
         data = self.master_socket.recv(1024)
         print(f"[Replica] PSYNC response: {data}")
-        # sleep(2)
+        sleep(1)
         # RDB
         # self.master_socket.sendall(resp_encoder(["RDB"]))
         # data = self.master_socket.recv(1024)
