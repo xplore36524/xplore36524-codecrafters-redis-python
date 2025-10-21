@@ -66,7 +66,7 @@ class Slave():
         # print(f"[Replica] RDB response: {data}")
         threading.Thread(
             target=handle_client,
-            args=(self.master_socket, self.config),
+            args=(self.master_socket, self.config, data),
             daemon=True,
         ).start()
 

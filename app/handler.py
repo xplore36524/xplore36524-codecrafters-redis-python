@@ -312,8 +312,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 #             decoded_data = resp_parser(data)
 #             _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
 
-def handle_client(connection, config):
-    buffer = b""
+def handle_client(connection, config, data):
+    buffer = data
     queued = False
     executing = False
     with connection:
@@ -340,7 +340,7 @@ def handle_client(connection, config):
 
                     print(f"Parsed command: {decoded_data}")
 
-                    if decoded_data[0] == 82:
+                    if decoded_data[0] == 82 or decoded_data[0] == "FULLRESYNC":
                         continue
 
                     _, queued = cmd_executor(
