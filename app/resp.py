@@ -17,8 +17,10 @@ def parse_all(data):
     """Parse as many complete RESP messages as possible from data."""
     messages = []
     buffer = data
+    print(f"parse_all called with buffer: {buffer}")
     if b"FULL" in buffer:
         _, buffer = buffer.split(b"\r\n", 1)
+    print(f"parse_all called with buffer2: {buffer}")
     while buffer:
         try:
             msg, buffer = parse_next(buffer)
