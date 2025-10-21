@@ -319,10 +319,16 @@ def handle_client(connection, config, data = b""):
     executing = False
     with connection:
         while True:
-            chunk = connection.recv(1024)
-            if not chunk and not buffer:
-                break
-            buffer += chunk
+            if not buffer:
+                chunk = connection.recv(1024)
+                if not chunk:
+                    break
+                buffer += chunk
+            # else:
+            #     chunk = connection.recv(1024)
+            #     if not chunk:
+            #         break
+            #     buffer += chunk
 
             print(f"Received chunk: {buffer}")
 
