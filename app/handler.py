@@ -312,7 +312,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 #             decoded_data = resp_parser(data)
 #             _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
 
-def handle_client(connection, config, data):
+def handle_client(connection, config, data = b""):
     buffer = data
     queued = False
     executing = False
