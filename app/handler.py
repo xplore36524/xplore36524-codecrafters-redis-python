@@ -1,17 +1,23 @@
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
+from time import sleep
+import threading    
 
 blocked = {}
 blocked_xread = {}
 queue = []
 REPLICAS = []
 BYTES_READ = 0
+replica_acks = 0
+prev_cmd = ""
 
 RDB_hex = '524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2'
 
 def cmd_executor(decoded_data, connection, config, queued, executing):
     global BYTES_READ
+    global replica_acks
+    global prev_cmd
     print(f"decoded_data: {decoded_data}")
     # EXEC Checker
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
@@ -261,6 +267,9 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
             # if executing:
             #     return response, queued
             connection.sendall(response)
+        elif decoded_data[1].upper() == "ACK" and config['role'] == 'master':
+            with threading.Lock():
+                replica_acks += 1
         else:
             response = simple_string_encoder("OK")
             # if executing:
@@ -287,12 +296,31 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         return [], queued
     # WAIT 
     elif decoded_data[0].upper() == "WAIT":
-        response = resp_encoder(len(REPLICAS))
-        # if executing:
-        #     return response, queued
-        if config['role'] == 'master':
-            connection.sendall(response)
-        return [], queued
+        print("prev_cmd:",prev_cmd)
+        if prev_cmd != "SET":
+            response = resp_encoder(len(REPLICAS))
+            if config['role'] == 'master':
+                connection.sendall(response)
+            return [], queued
+        else:
+            min_replicas = int(decoded_data[1])
+            timeout = int(decoded_data[2])
+            ack_count = 0
+            for replica_conn in REPLICAS:
+                print("replica_conn:",replica_conn)
+                replica_conn.send(resp_encoder(["REPLCONF", "GETACK", "*"]))
+
+            sleep(timeout / 1000)
+
+            with threading.Lock():
+                ack_count = replica_acks
+                replica_acks = 0
+            response = resp_encoder(ack_count)
+            # if executing:
+            #     return response, queued
+            if config['role'] == 'master':
+                connection.sendall(response)
+            return [], queued
     # ERR
     else:
         response = error_encoder("ERR")
@@ -313,12 +341,17 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 #             _, queued = cmd_executor(decoded_data, connection, config, queued, executing)
 
 def handle_client(connection, config, data = b""):
+    global prev_cmd
     print(f"handle_client called with data: {data}")
     buffer = data
     queued = False
     executing = False
     with connection:
         while True:
+            print(f"handle_client called with buffer: {data}")
+            if b"FULL" in data:
+                _, data = data.split(b"\r\n", 1)
+            print(f"handle_client called with buffer2: {buffer}")
             if not buffer:
                 chunk = connection.recv(1024)
                 if not chunk:
@@ -353,6 +386,8 @@ def handle_client(connection, config, data = b""):
                     _, queued = cmd_executor(
                         decoded_data, connection, config, queued, executing
                     )
+
+                    prev_cmd = decoded_data[0]
 
                 except Exception as e:
                     print(f"Error handling command {msg}: {e}")
