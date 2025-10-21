@@ -28,7 +28,7 @@ def parse_all(data):
     return messages
 
 def parse_next(data):
-    print(f"parse_next called with data: {data}")
+    # print(f"parse_next called with data: {data}")
     first, data = data.split(b"\r\n", 1)
     match first[:1]:
         case b"*":
