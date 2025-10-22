@@ -326,6 +326,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 
     # CONGIG GET
     elif decoded_data[0].upper() == "CONFIG":
+        print(f"CONFIG command")
         if decoded_data[2].upper() == "dir":
             response = resp_encoder(["dir",config['dir']])
         elif decoded_data[2].upper() == "dbfilename":
