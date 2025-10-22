@@ -328,9 +328,9 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     elif decoded_data[0].upper() == "CONFIG":
         print(f"CONFIG command")
         response = ""
-        if decoded_data[2].upper() == "dir":
+        if decoded_data[2] == "dir":
             response = resp_encoder(["dir",config['dir']])
-        elif decoded_data[2].upper() == "dbfilename":
+        elif decoded_data[2] == "dbfilename":
             response = resp_encoder(["dbfilename",config['dbfilename']])
         else:
             response = error_encoder("ERR")
