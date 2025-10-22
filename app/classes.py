@@ -12,6 +12,8 @@ class Master():
         self.config['role'] = 'master'
         self.config['master_replid'] = '8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb'
         self.config['master_replid_offset'] = '0'
+        self.dir = self.args.dir
+        self.dbfilename = self.args.dbfilename
 
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -32,6 +34,8 @@ class Slave():
         master_host, master_port = self.args.replicaof.split(' ')
         self.config['master_host'] = master_host
         self.config['master_port'] = int(master_port)
+        self.dir = self.args.dir
+        self.dbfilename = self.args.dbfilename
 
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

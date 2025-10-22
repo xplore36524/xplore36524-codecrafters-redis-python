@@ -321,6 +321,21 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
             if config['role'] == 'master':
                 connection.sendall(response)
             return [], queued
+        
+    ############################### RDB ###############################
+
+    # CONGIG GET
+    elif decoded_data[0].upper() == "CONFIG":
+        if decoded_data[1].upper() == "GET":
+            response = resp_encoder(["dir",config['dir']])
+        elif decoded_data[1].upper() == "dbfilename":
+            response = resp_encoder(["dbfilename",config['dbfilename']])
+        else:
+            response = error_encoder("ERR")
+        # if executing:
+        #     return response, queued
+        connection.sendall(response)
+        return [], queued
     # ERR
     else:
         response = error_encoder("ERR")
