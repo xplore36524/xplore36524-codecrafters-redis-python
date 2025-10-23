@@ -37,7 +37,7 @@ def getter(key):
     """Gets the value for a given key from the in-memory store."""
     print("store",store)
     if isinstance(store.get(key), list):
-        return store[key][0]
+        return store.get(key)[0]
     return store.get(key)
 
 def rpush(info, blocked):
