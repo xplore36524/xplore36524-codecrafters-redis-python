@@ -367,6 +367,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 def handle_client(connection, config, data = b""):
     global prev_cmd
     # store the data
+    print(config)
     store_rdb(config['store'])
     print(f"handle_client called with data: {data}")
     buffer = data
