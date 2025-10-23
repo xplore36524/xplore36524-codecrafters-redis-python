@@ -36,7 +36,7 @@ def setter(info):
 def getter(key):
     """Gets the value for a given key from the in-memory store."""
     print("store",store)
-    if isinstance(store.get(key), list):
+    if isinstance(store.get(key), tuple):
         return store.get(key)[0]
     return store.get(key)
 
