@@ -1,5 +1,5 @@
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
-from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment
+from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment, store_rdb, keys
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
 from time import sleep
 import threading    
@@ -338,6 +338,13 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         #     return response, queued
         connection.sendall(response)
         return [], queued
+    # KEYS
+    elif decoded_data[0].upper() == "KEYS":
+        response = resp_encoder(keys())
+        # if executing:
+        #     return response, queued
+        connection.sendall(response)
+        return [], queued
     # ERR
     else:
         response = error_encoder("ERR")
@@ -359,6 +366,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 
 def handle_client(connection, config, data = b""):
     global prev_cmd
+    # store the data
+    store_rdb(config['store'])
     print(f"handle_client called with data: {data}")
     buffer = data
     queued = False

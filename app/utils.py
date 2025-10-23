@@ -6,11 +6,19 @@ from app.resp import resp_encoder
 store = {}
 store_list = {}
 
+def store_rdb(info):
+    global store
+    global store_list
+    store = info
+
 def expire_key(key, expire_time):
     """Expires a key after a certain time."""
     time.sleep(expire_time)
     if key in store:
         del store[key]
+
+def keys():
+    return list(store.keys())
 
 def setter(info):
     """Sets the value for a given key in the in-memory store."""

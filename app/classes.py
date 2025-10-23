@@ -1,7 +1,7 @@
 import socket
 import threading
 from app.handler import handle_client
-from app.resp import resp_encoder
+from app.resp import resp_encoder, read_key_val_from_db
 from time import sleep
 
 class Master():
@@ -14,6 +14,8 @@ class Master():
         self.config['master_replid_offset'] = '0'
         self.config['dir'] = self.args.dir
         self.config['dbfilename'] = self.args.dbfilename
+        self.config['store'] = {}
+        read_key_val_from_db(self.config['dir'], self.config['dbfilename'], self.config['store'])
 
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
