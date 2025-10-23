@@ -38,6 +38,8 @@ class Slave():
         self.config['master_port'] = int(master_port)
         self.dir = self.args.dir
         self.dbfilename = self.args.dbfilename
+        self.config['store'] = {}
+        read_key_val_from_db(self.dir, self.dbfilename, self.config['store'])
 
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
