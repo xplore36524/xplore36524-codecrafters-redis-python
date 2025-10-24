@@ -21,6 +21,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     global replica_acks
     global prev_cmd
     global SUBSCRIBE
+    global subscriptions
     print(f"decoded_data: {decoded_data}")
     # EXEC Checker
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
