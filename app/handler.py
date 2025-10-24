@@ -352,11 +352,11 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     
     ############################# PUB/SUB ########################
     elif decoded_data[0].upper() == "SUBSCRIBE":
-        if connection not in subscriptions:
-            subscriptions[connection] = set()
-        if decoded_data[1] not in subscriptions[connection]:
-            subscriptions[connection].add(decoded_data[1])
-        subscriptions = list(set(subscriptions))
+        if connection[0] not in subscriptions:
+            subscriptions[connection[0]] = set()
+        if decoded_data[1] not in subscriptions[connection[0]]:
+            subscriptions[connection[0]].add(decoded_data[1])
+        # subscriptions = list(set(subscriptions))
         response = resp_encoder(['subscribe',decoded_data[1],len(subscriptions[connection])])
         connection.sendall(response)
         return [],queued
