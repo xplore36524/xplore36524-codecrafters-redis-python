@@ -345,6 +345,12 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         #     return response, queued
         connection.sendall(response)
         return [], queued
+    
+    ############################# PUB/SUB ########################
+    elif decoded_data[0].upper() == "SUBSCRIBE":
+        response = resp_encoder(['subscribe',decoded_data[1],1])
+        connection.sendall(response)
+        return [],queued
     # ERR
     else:
         response = error_encoder("ERR")
