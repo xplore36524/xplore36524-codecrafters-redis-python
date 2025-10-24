@@ -352,6 +352,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     
     ############################# PUB/SUB ########################
     elif decoded_data[0].upper() == "SUBSCRIBE":
+        print(connection)
         if connection[0] not in subscriptions:
             subscriptions[connection[0]] = set()
         if decoded_data[1] not in subscriptions[connection[0]]:
