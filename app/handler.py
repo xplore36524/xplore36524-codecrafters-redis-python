@@ -12,7 +12,7 @@ BYTES_READ = 0
 replica_acks = 0
 prev_cmd = ""
 SUBSCRIBE = 0
-subscriptions = {}
+subscriptions = []
 
 RDB_hex = '524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2'
 
@@ -351,8 +351,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     
     ############################# PUB/SUB ########################
     elif decoded_data[0].upper() == "SUBSCRIBE":
-        if decoded_data[1] not in subscriptions:
-            subscriptions.add(decoded_data[1])
+        subscriptions.append(decoded_data[1])
+        subscriptions = list(set(subscriptions))
         response = resp_encoder(['subscribe',decoded_data[1],len(subscriptions)])
         connection.sendall(response)
         return [],queued
