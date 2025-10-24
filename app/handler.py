@@ -11,6 +11,7 @@ REPLICAS = []
 BYTES_READ = 0
 replica_acks = 0
 prev_cmd = ""
+SUBSCRIBE = 0
 
 RDB_hex = '524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2'
 
@@ -18,6 +19,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     global BYTES_READ
     global replica_acks
     global prev_cmd
+    global SUBSCRIBE
     print(f"decoded_data: {decoded_data}")
     # EXEC Checker
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
@@ -348,7 +350,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     
     ############################# PUB/SUB ########################
     elif decoded_data[0].upper() == "SUBSCRIBE":
-        response = resp_encoder(['subscribe',decoded_data[1],1])
+        SUBSCRIBE+=1
+        response = resp_encoder(['subscribe',decoded_data[1],SUBSCRIBE])
         connection.sendall(response)
         return [],queued
     # ERR
