@@ -24,6 +24,23 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     global subscriptions
     print(f"decoded_data: {decoded_data}")
     # EXEC Checker
+    if SUBSCRIBE == 1:
+        if decoded_data[0] == "UNSUBSCRIBE":
+            pass
+        elif decoded_data[0] == "SUBSCRIBE":
+            pass
+        elif decoded_data[0] == "PSUBSCRIBE":
+            pass
+        elif decoded_data[0] == "PUNSUBSCRIBE":
+            pass
+        elif decoded_data[0] == "PING":
+            pass
+        elif decoded_data[0] == "QUIT":
+            pass
+        else:
+            response = error_encoder("ERR Can't execute "+decoded_data[0])
+            connection.sendall(response)
+        return [], queued
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
         # append to last queue 
         queue[len(queue)-1].append(decoded_data)
@@ -353,6 +370,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     ############################# PUB/SUB ########################
     elif decoded_data[0].upper() == "SUBSCRIBE":
         print(connection)
+        SUBSCRIBE = 1
         if connection not in subscriptions:
             subscriptions[connection] = set()
         if decoded_data[1] not in subscriptions[connection]:
