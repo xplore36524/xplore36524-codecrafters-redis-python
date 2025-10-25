@@ -28,7 +28,14 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         if decoded_data[0].upper() == "UNSUBSCRIBE":
             pass
         elif decoded_data[0].upper() == "SUBSCRIBE":
-            pass
+            if connection not in subscriptions:
+                subscriptions[connection] = set()
+            if decoded_data[1] not in subscriptions[connection]:
+                subscriptions[connection].add(decoded_data[1])
+            # subscriptions = list(set(subscriptions))
+            response = resp_encoder(['subscribe',decoded_data[1],len(subscriptions[connection])])
+            connection.sendall(response)
+            return [],queued
         elif decoded_data[0].upper() == "PSUBSCRIBE":
             pass
         elif decoded_data[0].upper() == "PUNSUBSCRIBE":
