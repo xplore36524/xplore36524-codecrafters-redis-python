@@ -24,7 +24,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     global subscriptions
     print(f"decoded_data: {decoded_data}")
     # EXEC Checker
-    if SUBSCRIBE == 1:
+    if SUBSCRIBE == 1 and connection in subscriptions:
         if decoded_data[0].upper() == "UNSUBSCRIBE":
             pass
         elif decoded_data[0].upper() == "SUBSCRIBE":
