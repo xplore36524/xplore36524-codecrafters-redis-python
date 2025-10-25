@@ -26,7 +26,11 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     # EXEC Checker
     if SUBSCRIBE == 1 and connection in subscriptions:
         if decoded_data[0].upper() == "UNSUBSCRIBE":
-            pass
+            if decoded_data[1] in subscriptions[connection]:
+                subscriptions[connection].remove(decoded_data[1])
+            response = resp_encoder(['unsubscribe',decoded_data[1],len(subscriptions[connection])])
+            connection.sendall(response)
+            return [],queued
         elif decoded_data[0].upper() == "SUBSCRIBE":
             if connection not in subscriptions:
                 subscriptions[connection] = set()
