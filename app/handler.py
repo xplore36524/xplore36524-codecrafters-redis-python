@@ -25,20 +25,20 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     print(f"decoded_data: {decoded_data}")
     # EXEC Checker
     if SUBSCRIBE == 1:
-        if decoded_data[0] == "UNSUBSCRIBE":
+        if decoded_data[0].upper() == "UNSUBSCRIBE":
             pass
-        elif decoded_data[0] == "SUBSCRIBE":
+        elif decoded_data[0].upper() == "SUBSCRIBE":
             pass
-        elif decoded_data[0] == "PSUBSCRIBE":
+        elif decoded_data[0].upper() == "PSUBSCRIBE":
             pass
-        elif decoded_data[0] == "PUNSUBSCRIBE":
+        elif decoded_data[0].upper() == "PUNSUBSCRIBE":
             pass
-        elif decoded_data[0] == "PING":
+        elif decoded_data[0].upper() == "PING":
             pass
-        elif decoded_data[0] == "QUIT":
+        elif decoded_data[0].upper() == "QUIT":
             pass
         else:
-            response = (f"ERR Can't execute {decoded_data[0]}").encode()
+            response = error_encoder(f"ERR Can't execute {decoded_data[0]}")
             connection.sendall(response)
         return [], queued
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
