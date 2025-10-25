@@ -377,6 +377,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         return [], queued
     
     ############################# PUB/SUB ########################
+
+    # SUBSCRIBE
     elif decoded_data[0].upper() == "SUBSCRIBE":
         print(connection)
         SUBSCRIBE = 1
@@ -388,6 +390,20 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         response = resp_encoder(['subscribe',decoded_data[1],len(subscriptions[connection])])
         connection.sendall(response)
         return [],queued
+    
+    # PUBLISH
+    elif decoded_data[0].upper() == "PUBLISH":
+        channel_name = decoded_data[1]
+        message = decoded_data[2]
+        tot_subscribers = 0
+        for conn in subscriptions:
+            if channel_name in subscriptions[conn]:
+                tot_subscribers += 1
+                # conn.sendall(resp_encoder(['publish',channel_name,message]))
+        response = resp_encoder(tot_subscribers)
+        connection.sendall(response)
+        return [], queued
+
     # ERR
     else:
         response = error_encoder("ERR")
