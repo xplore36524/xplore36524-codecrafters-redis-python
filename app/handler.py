@@ -38,7 +38,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         elif decoded_data[0].upper() == "QUIT":
             pass
         else:
-            response = (f"-ERR Can't execute {decoded_data[0]}").encode()
+            response = (f"-ERR Can't execute '{decoded_data[0].tolower()}'").encode()
             connection.sendall(response)
         return [], queued
     if queued and decoded_data[0] != "EXEC" and decoded_data[0] != "DISCARD":
