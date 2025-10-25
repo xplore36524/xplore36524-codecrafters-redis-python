@@ -399,7 +399,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         for conn in subscriptions:
             if channel_name in subscriptions[conn]:
                 tot_subscribers += 1
-                # conn.sendall(resp_encoder(['publish',channel_name,message]))
+                conn.sendall(resp_encoder(['message',channel_name,message]))
         response = resp_encoder(tot_subscribers)
         connection.sendall(response)
         return [], queued
