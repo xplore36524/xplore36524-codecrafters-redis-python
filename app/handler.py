@@ -41,7 +41,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         elif decoded_data[0].upper() == "PUNSUBSCRIBE":
             pass
         elif decoded_data[0].upper() == "PING":
-            response = resp_encoder(['pong',0])
+            response = resp_encoder(['pong',""])
             connection.sendall(response)
             return [],queued
         elif decoded_data[0].upper() == "QUIT":
