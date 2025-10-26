@@ -34,6 +34,7 @@ def zrange(info):
     key = info[0]
     start = int(info[1])
     end = int(info[2])
+    print(f"zrange called with key: {key}, start: {start}, end: {end}")
     if end < 0:
         end = len(sorted_set[key]) + end
     end = min(end, len(sorted_set[key]-1))
