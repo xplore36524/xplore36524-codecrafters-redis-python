@@ -17,7 +17,7 @@ def zadd(info):
 
     # add new member
     sorted_set[key].append((score, member))
-    sorted_set[key].sort(key=lambda x: (x[0], x[1]))
+    sorted_set[key].sort(key=lambda x: (x[1], x[0]))
     return 1
 
 def zrank(info):
