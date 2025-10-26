@@ -39,6 +39,8 @@ def zrange(info):
     end = min(end, len(sorted_set[key]))
     if key not in sorted_set or start >= len(sorted_set[key]) or (end > 0 and end < start):
         return []
+    result = []
     if key in sorted_set:
-        return sorted_set[key][start:end+1][1]
-    return []
+        for i in range(start, end):
+            result.append(sorted_set[key][i][1])
+    return result
