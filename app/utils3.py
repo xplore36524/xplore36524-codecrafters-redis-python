@@ -8,8 +8,11 @@ def zadd(info):
     if key not in sorted_set:
         sorted_set[key] = []
 
-    sorted_set[key].append((score, member))
-
-    sorted_set[key].sort(key=lambda x: x[0])
-
-    return len(sorted_set[key])
+    if (_,member) in sorted_set[key]:
+        sorted_set[key][sorted_set[key].index((_,member))] = (score, member)
+        sorted_set[key].sort(key=lambda x: x[0])
+        return 0
+    else:
+        sorted_set[key].append((score, member))
+        sorted_set[key].sort(key=lambda x: x[0])
+        return 1
