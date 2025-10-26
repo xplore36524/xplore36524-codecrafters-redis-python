@@ -41,6 +41,6 @@ def zrange(info):
         return []
     result = []
     if key in sorted_set:
-        for i in range(start, end):
+        for i in range(start, end+1):
             result.append(sorted_set[key][i][1])
     return result
