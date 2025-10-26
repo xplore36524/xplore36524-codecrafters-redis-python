@@ -31,6 +31,7 @@ def zrank(info):
     return None
 
 def zrange(info):
+    sorted_set[key].sort(key=lambda x: (x[0], x[1]))
     key = info[0]
     start = int(info[1])
     end = int(info[2])
