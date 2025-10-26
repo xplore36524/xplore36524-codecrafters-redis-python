@@ -31,10 +31,10 @@ def zrank(info):
     return None
 
 def zrange(info):
-    sorted_set[key].sort(key=lambda x: (x[0], x[1]))
     key = info[0]
     start = int(info[1])
     end = int(info[2])
+    sorted_set[key].sort(key=lambda x: (x[0], x[1]))
     print(f"zrange called with key: {key}, start: {start}, end: {end}")
     print(f"sorted_set: {sorted_set}")
     if key not in sorted_set:
