@@ -29,3 +29,16 @@ def zrank(info):
             if sorted_set[key][i][1] == member:
                 return i
     return None
+
+def zrange(info):
+    key = info[0]
+    start = int(info[1])
+    end = int(info[2])
+    if end < 0:
+        end = len(sorted_set[key]) + end
+    end = min(end, len(sorted_set[key]))
+    if key not in sorted_set or start >= len(sorted_set[key]) or (end > 0 and end < start):
+        return []
+    if key in sorted_set:
+        return sorted_set[key][start:end+1]
+    return []
