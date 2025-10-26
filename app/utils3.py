@@ -35,11 +35,11 @@ def zrange(info):
     start = int(info[1])
     end = int(info[2])
     print(f"zrange called with key: {key}, start: {start}, end: {end}")
+    if key not in sorted_set or start >= len(sorted_set[key]) or (end > 0 and end < start):
+        return []
     if end < 0:
         end = len(sorted_set[key]) + end
     end = min(end, len(sorted_set[key])-1)
-    if key not in sorted_set or start >= len(sorted_set[key]) or (end > 0 and end < start):
-        return []
     result = []
     if key in sorted_set:
         for i in range(start, end+1):
