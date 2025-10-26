@@ -54,3 +54,9 @@ def zrange(info):
         for i in range(start, end+1):
             result.append(sorted_set[key][i][1])
     return result
+
+def zcard(info):
+    key = info[0]
+    if key in sorted_set:
+        return len(sorted_set[key])
+    return 0

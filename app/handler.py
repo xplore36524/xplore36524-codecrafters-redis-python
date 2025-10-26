@@ -1,7 +1,7 @@
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment, store_rdb, keys
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
-from app.utils3 import zadd, zrank, zrange
+from app.utils3 import zadd, zrank, zrange, zcard
 from time import sleep
 import threading    
 
@@ -430,6 +430,14 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     # ZRANGE
     elif decoded_data[0].upper() == "ZRANGE":
         response = resp_encoder(zrange(decoded_data[1:]))
+        # if executing:
+        #     return response, queued
+        connection.sendall(response)
+        return [], queued
+
+    # ZCARD
+    elif decoded_data[0].upper() == "ZCARD":
+        response = resp_encoder(zcard(decoded_data[1:]))
         # if executing:
         #     return response, queued
         connection.sendall(response)
