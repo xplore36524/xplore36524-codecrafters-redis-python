@@ -40,6 +40,8 @@ def zrange(info):
         return []
     if end < 0:
         end = len(sorted_set[key]) + end
+    if start < 0:
+        start = len(sorted_set[key]) + start
     end = min(end, len(sorted_set[key])-1)
     result = []
     if key in sorted_set:
