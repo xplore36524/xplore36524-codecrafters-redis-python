@@ -25,6 +25,7 @@ def zrank(info):
     member = info[1]
 
     if key in sorted_set:
+        sorted_set[key].sort(key=lambda x: (x[0], x[1]))
         for i in range(len(sorted_set[key])):
             if sorted_set[key][i][1] == member:
                 return i
