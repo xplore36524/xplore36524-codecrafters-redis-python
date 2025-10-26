@@ -61,3 +61,22 @@ def zcard(info):
     if key in sorted_set:
         return len(sorted_set[key])
     return 0
+
+def zscore(info):
+    key = info[0]
+    member = info[1]
+    if key in sorted_set:
+        for i in range(len(sorted_set[key])):
+            if sorted_set[key][i][1] == member:
+                return sorted_set[key][i][0]
+    return -1
+
+def zrem(info):
+    key = info[0]
+    member = info[1]
+    if key in sorted_set:
+        for i in range(len(sorted_set[key])):
+            if sorted_set[key][i][1] == member:
+                del sorted_set[key][i]
+                return 1
+    return 0
