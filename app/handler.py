@@ -1,7 +1,7 @@
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment, store_rdb, keys
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
-from app.utils3 import zadd
+from app.utils3 import zadd, zrank
 from time import sleep
 import threading    
 
