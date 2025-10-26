@@ -40,5 +40,5 @@ def zrange(info):
     if key not in sorted_set or start >= len(sorted_set[key]) or (end > 0 and end < start):
         return []
     if key in sorted_set:
-        return sorted_set[key][start:end+1]
+        return sorted_set[key][start:end+1][1]
     return []
