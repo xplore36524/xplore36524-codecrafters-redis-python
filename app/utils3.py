@@ -13,7 +13,7 @@ def zadd(info):
         if sorted_set[key][i][1] == member:
             sorted_set[key][i] = (score, member)
             sorted_set[key].sort(key=lambda x: x[0])
-            return 1
+            return 0
 
     # add new member
     sorted_set[key].append((score, member))
