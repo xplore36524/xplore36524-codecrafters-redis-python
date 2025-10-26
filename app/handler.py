@@ -1,6 +1,7 @@
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment, store_rdb, keys
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
+from app.utils3 import zadd
 from time import sleep
 import threading    
 
@@ -405,6 +406,16 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
                 tot_subscribers += 1
                 conn.sendall(resp_encoder(['message',channel_name,message]))
         response = resp_encoder(tot_subscribers)
+        connection.sendall(response)
+        return [], queued
+
+    ######################### SORTED SETS ########################
+
+    # ZADD
+    elif decoded_data[0].upper() == "ZADD":
+        response = resp_encoder(zadd(decoded_data[1:]))
+        # if executing:
+        #     return response, queued
         connection.sendall(response)
         return [], queued
 
