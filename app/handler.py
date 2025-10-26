@@ -418,6 +418,14 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         #     return response, queued
         connection.sendall(response)
         return [], queued
+    
+    # ZRANK
+    elif decoded_data[0].upper() == "ZRANK":
+        response = resp_encoder(zrank(decoded_data[1:]))
+        # if executing:
+        #     return response, queued
+        connection.sendall(response)
+        return [], queued
 
     # ERR
     else:
