@@ -92,6 +92,8 @@ def geoadd(info):
     latitude = float(info[2])
     member = info[3]
 
+    if abs(longitude)>180 or abs(latitude)>85.05112878:
+        return "ERR invalid longitude,latitude pair"
     if key not in geolocations:
         geolocations[key] = []
 

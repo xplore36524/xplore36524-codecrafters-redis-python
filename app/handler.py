@@ -466,6 +466,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         response = resp_encoder(geoadd(decoded_data[1:]))
         # if executing:
         #     return response, queued
+        if response == -1:
+            response = "ERR invalid longitude,latitude pair"
         connection.sendall(response)
         return [], queued
 
