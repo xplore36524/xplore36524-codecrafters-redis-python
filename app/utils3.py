@@ -1,5 +1,5 @@
 sorted_set = {}
-from app.geo import encode
+from app.geo import encode, decode
 # geolocations = {}
 
 ########################## SORTED SETS ##########################
@@ -104,3 +104,12 @@ def geoadd(info):
     sorted_set[key].append((norm, member))
     sorted_set[key].sort(key=lambda x: (x[0], x[1]))
     return 1
+
+def geopos(info):
+    key = info[0]
+    member = info[1]
+    if key in sorted_set:
+        for i in range(len(sorted_set[key])):
+            if sorted_set[key][i][1] == member:
+                return decode(int(sorted_set[key][i][0]))
+    return None

@@ -1,7 +1,7 @@
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment, store_rdb, keys
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
-from app.utils3 import zadd, zrank, zrange, zcard, zscore, zrem, geoadd
+from app.utils3 import zadd, zrank, zrange, zcard, zscore, zrem, geoadd, geopos
 from time import sleep
 import threading    
 
@@ -470,6 +470,14 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
             response = error_encoder("ERR invalid longitude,latitude pair")
         else:
             response = resp_encoder(response)
+        connection.sendall(response)
+        return [], queued
+    
+    # GEOPOS
+    elif decoded_data[0].upper() == "GEOPOS":
+        response = resp_encoder(geopos(decoded_data[1:]))
+        # if executing:
+        #     return response, queued
         connection.sendall(response)
         return [], queued
 
