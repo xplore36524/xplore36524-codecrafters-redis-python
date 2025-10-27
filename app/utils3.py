@@ -1,5 +1,5 @@
 sorted_set = {}
-geolocations = {}
+# geolocations = {}
 
 ########################## SORTED SETS ##########################
 def zadd(info):
@@ -94,8 +94,9 @@ def geoadd(info):
 
     if abs(longitude)>180 or abs(latitude)>85.05112878:
         return -1
-    if key not in geolocations:
-        geolocations[key] = []
+    if key not in sorted_set:
+        sorted_set[key] = []
 
-    geolocations[key].append((longitude, latitude, member))
+    sorted_set[key].append((0, member))
+    sorted_set[key].sort(key=lambda x: (x[0], x[1]))
     return 1
