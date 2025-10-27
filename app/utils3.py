@@ -1,5 +1,7 @@
 sorted_set = {}
+geolocations = {}
 
+########################## SORTED SETS ##########################
 def zadd(info):
     key = info[0]
     score = info[1]
@@ -80,3 +82,18 @@ def zrem(info):
                 del sorted_set[key][i]
                 return 1
     return 0
+
+
+#################################### GEOSPATIAL ##############################
+
+def geoadd(info):
+    key = info[0]
+    longitude = float(info[1])
+    latitude = float(info[2])
+    member = info[3]
+
+    if key not in geolocations:
+        geolocations[key] = []
+
+    geolocations[key].append((longitude, latitude, member))
+    return 1
