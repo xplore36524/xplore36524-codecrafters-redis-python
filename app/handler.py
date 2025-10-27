@@ -463,11 +463,13 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 
     # GEOADD
     elif decoded_data[0].upper() == "GEOADD":
-        response = resp_encoder(geoadd(decoded_data[1:]))
+        response = geoadd(decoded_data[1:])
         # if executing:
         #     return response, queued
         if response == -1:
-            response = "ERR invalid longitude,latitude pair"
+            response = error_encoder("ERR invalid longitude,latitude pair")
+        else:
+            response = resp_encoder(response)
         connection.sendall(response)
         return [], queued
 
