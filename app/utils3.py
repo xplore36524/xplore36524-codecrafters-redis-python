@@ -1,4 +1,5 @@
 sorted_set = {}
+from app.geo import normalize_coordinates
 # geolocations = {}
 
 ########################## SORTED SETS ##########################
@@ -97,6 +98,6 @@ def geoadd(info):
     if key not in sorted_set:
         sorted_set[key] = []
 
-    sorted_set[key].append((0, member))
+    sorted_set[key].append((normalize_coordinates(latitude, longitude), member))
     sorted_set[key].sort(key=lambda x: (x[0], x[1]))
     return 1
