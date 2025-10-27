@@ -98,7 +98,7 @@ def geoadd(info):
     if key not in sorted_set:
         sorted_set[key] = []
 
-    norm = encode(longitude, latitude)
+    norm = encode(latitude, longitude)
     print(norm)
     norm = str(norm)
     sorted_set[key].append((norm, member))
