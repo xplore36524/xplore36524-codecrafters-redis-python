@@ -100,6 +100,7 @@ def geoadd(info):
 
     norm = encode(longitude, latitude)
     print(norm)
+    norm = str(norm)
     sorted_set[key].append((norm, member))
     sorted_set[key].sort(key=lambda x: (x[0], x[1]))
     return 1
