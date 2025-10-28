@@ -107,23 +107,30 @@ def geoadd(info):
 
 def geopos(info):
     key = info[0]
-    members = []
-    for i in range(1, len(info)):
-        members.append(info[i])
+    members = info[1:]
 
+    # RESP pieces
     null_array = "*-1\r\n"
-    # null_array = null_array.encode('utf-8')
-    result = []
+    coord_array = "*2\r\n$1\r\n0\r\n$1\r\n0\r\n"  # hardcoded lat/lon (both "0")
+
+    result = ""
+
     if key in sorted_set:
+        # For each member requested
         for member in members:
-            f = False
-            for i in range(len(sorted_set[key])):
-                if sorted_set[key][i][1] == member:
-                    f = True
-                    result.append(decode(int(sorted_set[key][i][0])))
-            if not f:
-                result.append(null_array)
+            found = False
+            for score, name in sorted_set[key]:
+                if name == member:
+                    found = True
+                    result += coord_array
+                    break
+            if not found:
+                result += null_array
     else:
-        for i in range(len(members)):
-            result.append(null_array)
-    return result
+        # Key doesn't exist → all null arrays
+        for _ in members:
+            result += null_array
+
+    # Wrap as RESP array with total count
+    response = f"*{len(members)}\r\n" + result
+    return response.encode("utf-8")
