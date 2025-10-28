@@ -1,5 +1,6 @@
 sorted_set = {}
 from app.geo import encode, decode
+from app.resp import resp_encoder
 # geolocations = {}
 
 ########################## SORTED SETS ##########################
@@ -111,6 +112,8 @@ def geopos(info):
     for i in range(1, len(info)):
         members.append(info[i])
 
+    null_array = "*-1\r\n"
+    null_array = null_array.encode('utf-8')
     result = []
     if key in sorted_set:
         for member in members:
@@ -118,10 +121,10 @@ def geopos(info):
             for i in range(len(sorted_set[key])):
                 if sorted_set[key][i][1] == member:
                     f = True
-                    result.append(decode(int(sorted_set[key][i][0])))
+                    result.append(resp_encoder(decode(int(sorted_set[key][i][0]))))
             if not f:
-                result.append(['-1'])
+                result.append(null_array)
     else:
         for i in range(len(members)):
-            result.append(['-1'])
+            result.append(null_array)
     return result
