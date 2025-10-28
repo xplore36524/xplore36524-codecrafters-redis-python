@@ -114,7 +114,7 @@ def geopos(info):
     for member in members:
         score_float = zscore([key, member])
 
-        if score_float is None:
+        if score_float == -1:
             # Member or key does not exist: Null Array (*-1\r\n)
             final_response_parts.append(b"*-1\r\n")
             continue
