@@ -78,4 +78,4 @@ def convert_grid_numbers_to_coordinates(grid_latitude_number, grid_longitude_num
     # Calculate the center point of the grid cell
     latitude = (grid_latitude_min + grid_latitude_max) / 2
     longitude = (grid_longitude_min + grid_longitude_max) / 2
-    return [resp_encoder(str(latitude)), resp_encoder(str(longitude))]
+    return [latitude, longitude]
