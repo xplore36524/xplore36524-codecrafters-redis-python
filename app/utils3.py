@@ -121,4 +121,7 @@ def geopos(info):
                     result.append(decode(int(sorted_set[key][i][0])))
             if not f:
                 result.append(-1)
+    else:
+        for i in range(len(members)):
+            result.append(-1)
     return result
