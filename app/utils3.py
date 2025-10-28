@@ -111,33 +111,47 @@ def geopos(info):
 
     final_response_parts = []
 
-    # Hardcoded coordinates as requested for this stage
-    HARDCODED_LONGITUDE_STR = "0"
-    HARDCODED_LATITUDE_STR = "0"
-
-    # Pre-encode for efficiency
-    lon_bytes = HARDCODED_LONGITUDE_STR.encode()
-    lat_bytes = HARDCODED_LATITUDE_STR.encode()
-    lon_resp = b"$" + str(len(lon_bytes)).encode() + b"\r\n" + lon_bytes + b"\r\n"
-    lat_resp = b"$" + str(len(lat_bytes)).encode() + b"\r\n" + lat_bytes + b"\r\n"
-
-    # Full response for an existing member: *2\r\n<lon_resp><lat_resp>
-    MEMBER_FOUND_RESP = b"*2\r\n" + lon_resp + lat_resp
-    # Full response for a missing member: Null Array
-    MEMBER_MISSING_RESP = b"*-1\r\n"
-
     for member in members:
-        # Check if the member exists in the sorted set (Geo data is stored as ZSET)
-        score = zscore([key, member])
+        score_float = zscore([key, member])
 
-        if score is None:
+        if score_float is None:
             # Member or key does not exist: Null Array (*-1\r\n)
-            final_response_parts.append(MEMBER_MISSING_RESP)
-        else:
-            # Member exists: Array of [longitude, latitude] with hardcoded values
-            final_response_parts.append(MEMBER_FOUND_RESP)
+            final_response_parts.append(b"*-1\r\n")
+            continue
 
-    # Wrap all individual responses in the final RESP array
+        # Logic for FOUND member
+        score_int = int(score_float)
+
+        # Returns (longitude, latitude)
+        try:
+            longitude, latitude = decode(score_int)
+        except Exception:
+            # Internal error during decoding
+            final_response_parts.append(b"*-1\r\n")
+            continue
+
+        # 4. Format coordinates as RESP Bulk Strings (Reverted to robust float string conversion)
+
+        # Use Python's default high-precision float string representation (str()),
+        # which is the most reliable way to maintain precision and avoid fragility.
+        lon_str = str(longitude)
+        lat_str = str(latitude)
+
+        # Format as Bulk Strings
+        lon_bytes = lon_str.encode()
+        lat_bytes = lat_str.encode()
+        lon_resp = (
+            b"$" + str(len(lon_bytes)).encode() + b"\r\n" + lon_bytes + b"\r\n"
+        )
+        lat_resp = (
+            b"$" + str(len(lat_bytes)).encode() + b"\r\n" + lat_bytes + b"\r\n"
+        )
+
+        # Final response for an existing member: *2\r\n<lon_resp><lat_resp>
+        member_resp = b"*2\r\n" + lon_resp + lat_resp
+        final_response_parts.append(member_resp)
+
+    # 5. Wrap all individual responses in the final RESP array
     response = (
         b"*"
         + str(len(final_response_parts)).encode()
