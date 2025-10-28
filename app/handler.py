@@ -475,7 +475,9 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     
     # GEOPOS
     elif decoded_data[0].upper() == "GEOPOS":
-        response = resp_encoder(geopos(decoded_data[1:]))
+        response = geopos(decoded_data[1:])
+        print(response)
+        response = resp_encoder(response)
         # if executing:
         #     return response, queued
         connection.sendall(response)
