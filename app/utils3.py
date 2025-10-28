@@ -112,7 +112,7 @@ def geopos(info):
         members.append(info[i])
 
     null_array = "*-1\r\n"
-    null_array = null_array.encode('utf-8')
+    # null_array = null_array.encode('utf-8')
     result = []
     if key in sorted_set:
         for member in members:
