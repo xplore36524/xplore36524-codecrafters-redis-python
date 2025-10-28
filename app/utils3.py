@@ -107,10 +107,18 @@ def geoadd(info):
 
 def geopos(info):
     key = info[0]
-    member = info[1]
+    members = []
+    for i in range(1, len(info)):
+        members.append(info[i])
+
+    result = []
     if key in sorted_set:
-        for i in range(len(sorted_set[key])):
-            if sorted_set[key][i][1] == member:
-                # return decode(int(sorted_set[key][i][0]))
-                return [["0", "0"], ["0", "0"]]
-    return [-1,-1]
+        for member in members:
+            f = False
+            for i in range(len(sorted_set[key])):
+                if sorted_set[key][i][1] == member:
+                    f = True
+                    result.append(decode(sorted_set[key][i][0]))
+            if not f:
+                result.append(-1)
+    return result
