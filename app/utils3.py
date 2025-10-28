@@ -128,7 +128,7 @@ def geopos(info):
 
     for member in members:
         # Check if the member exists in the sorted set (Geo data is stored as ZSET)
-        score = decode(key, member)
+        score = zscore(key, member)
 
         if score is None:
             # Member or key does not exist: Null Array (*-1\r\n)
