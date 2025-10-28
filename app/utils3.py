@@ -118,7 +118,7 @@ def geopos(info):
             for i in range(len(sorted_set[key])):
                 if sorted_set[key][i][1] == member:
                     f = True
-                    result.append(decode(sorted_set[key][i][0]))
+                    result.append(decode(int(sorted_set[key][i][0])))
             if not f:
                 result.append(-1)
     return result
