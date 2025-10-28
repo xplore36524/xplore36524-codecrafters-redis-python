@@ -1,6 +1,5 @@
 sorted_set = {}
 from app.geo import encode, decode
-from app.resp import resp_encoder
 # geolocations = {}
 
 ########################## SORTED SETS ##########################
