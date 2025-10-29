@@ -1,4 +1,5 @@
 from app.resp import resp_encoder
+import math
 
 MIN_LATITUDE = -85.05112878
 MAX_LATITUDE = 85.05112878
@@ -7,6 +8,12 @@ MAX_LONGITUDE = 180
 
 LATITUDE_RANGE = MAX_LATITUDE - MIN_LATITUDE
 LONGITUDE_RANGE = MAX_LONGITUDE - MIN_LONGITUDE
+
+EARTH_RADIUS_IN_METERS = 6372797.560856
+
+def deg_rad(deg):
+    """Convert degrees to radians."""
+    return deg * math.pi / 180.0
 
 def encode(latitude: float, longitude: float) -> int:
     # Normalize to the range 0-2^26
@@ -79,3 +86,23 @@ def convert_grid_numbers_to_coordinates(grid_latitude_number, grid_longitude_num
     latitude = (grid_latitude_min + grid_latitude_max) / 2
     longitude = (grid_longitude_min + grid_longitude_max) / 2
     return (longitude, latitude)
+
+def geohashGetLatDistance(lat1d, lat2d):
+    """Compute north–south distance (latitude difference only)."""
+    return EARTH_RADIUS_IN_METERS * abs(deg_rad(lat2d) - deg_rad(lat1d))
+
+def geohashGetDistance(lon1d, lat1d, lon2d, lat2d):
+    """Compute great-circle distance between two coordinates."""
+    lon1r = deg_rad(lon1d)
+    lon2r = deg_rad(lon2d)
+    v = math.sin((lon2r - lon1r) / 2.0)
+
+    # Optimization: if longitude difference is 0, use latitude-only distance
+    if v == 0.0:
+        return geohashGetLatDistance(lat1d, lat2d)
+
+    lat1r = deg_rad(lat1d)
+    lat2r = deg_rad(lat2d)
+    u = math.sin((lat2r - lat1r) / 2.0)
+    a = u * u + math.cos(lat1r) * math.cos(lat2r) * v * v
+    return 2.0 * EARTH_RADIUS_IN_METERS * math.asin(math.sqrt(a))

@@ -1,5 +1,5 @@
 sorted_set = {}
-from app.geo import encode, decode
+from app.geo import encode, decode, geohashGetDistance
 # geolocations = {}
 
 ########################## SORTED SETS ##########################
@@ -159,3 +159,16 @@ def geopos(info):
         + b"".join(final_response_parts)
     )
     return response
+
+def geodist(info):
+    key = info[0]
+    member1 = info[1]
+    member2 = info[2]
+    if key in sorted_set:
+        for i in range(len(sorted_set[key])):
+            if sorted_set[key][i][1] == member1:
+                longitude1, latitude1 = decode(int(sorted_set[key][i][0]))
+            if sorted_set[key][i][1] == member2:
+                longitude2, latitude2 = decode(int(sorted_set[key][i][0]))
+        return geohashGetDistance(longitude1, latitude1, longitude2, latitude2)
+    return -1
