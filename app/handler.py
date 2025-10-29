@@ -523,7 +523,6 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
             response = b"*0\r\n"
             connection.sendall(response)
             return [], queued
-       
 
         # 4. Return matching members as a RESP Array (order does not matter)
         response_parts = []
