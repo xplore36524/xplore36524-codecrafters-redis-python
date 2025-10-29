@@ -540,7 +540,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
             + b"\r\n"
             + b"".join(response_parts)
         )
-        return response
+        connection.sendall(response)
+        return [], queued
     
     # ERR
     else:
