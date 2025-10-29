@@ -486,9 +486,10 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
     # GEODIST
     elif decoded_data[0].upper() == "GEODIST":
         response = geodist(decoded_data[1:])
+        print(response)
         # if executing:
         #     return response, queued
-        response = resp_encoder(response)
+        response = resp_encoder(str(response))
         connection.sendall(response)
         return [], queued
     # ERR
