@@ -523,6 +523,7 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
 
         # 4. Return matching members as a RESP Array (order does not matter)
         response_parts = []
+        print(matching_members)
         for member in matching_members:
             member_bytes = member.encode()
             response_parts.append(
