@@ -195,7 +195,7 @@ def geomembers(key,center_lon,center_lat,search_radius_m):
     if key not in sorted_set:
         return []
     members_scores = sorted_set[key]
-
+    print(f"members_scores: {members_scores}")
     matching_members = []
 
     # 3. Iterate, decode coordinates, and check distance
