@@ -519,7 +519,8 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         matching_members = geomembers(key, center_lon, center_lat, search_radius_m)
 
         if matching_members == []:
-            return b"*0\r\n"
+            connection.sendall(response)
+            return [], queued
 
         # 4. Return matching members as a RESP Array (order does not matter)
         response_parts = []
