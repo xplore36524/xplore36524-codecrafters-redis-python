@@ -215,5 +215,5 @@ def geomembers(key,center_lon,center_lat,search_radius_m):
         # Check if the member is within the search radius (distance <= radius in meters)
         if distance <= search_radius_m:
             matching_members.append(member_name)
-        
+    print(f"matching_members: {matching_members}")
     return matching_members
