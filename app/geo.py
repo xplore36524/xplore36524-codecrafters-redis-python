@@ -106,3 +106,26 @@ def geohashGetDistance(lon1d, lat1d, lon2d, lat2d):
     u = math.sin((lat2r - lat1r) / 2.0)
     a = u * u + math.cos(lat1r) * math.cos(lat2r) * v * v
     return 2.0 * EARTH_RADIUS_IN_METERS * math.asin(math.sqrt(a))
+
+def haversine_distance(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
+    """Calculates the distance between two points (lon, lat) using the Haversine formula."""
+    # Convert degrees to radians
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+
+    # Differences
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+
+    # Haversine formula calculation: a = sin²(dlat/2) + cos(lat1) * cos(lat2) * sin²(dlon/2)
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+    )
+    # c = 2 * atan2(sqrt(a), sqrt(1-a)) simplifies to 2 * asin(sqrt(a))
+    c = 2 * math.asin(math.sqrt(a))
+
+    distance = EARTH_RADIUS_IN_METERS * c
+    return distance

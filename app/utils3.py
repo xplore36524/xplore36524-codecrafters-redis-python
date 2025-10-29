@@ -1,5 +1,5 @@
 sorted_set = {}
-from app.geo import encode, decode, geohashGetDistance
+from app.geo import encode, decode, geohashGetDistance, haversine_distance
 # geolocations = {}
 
 ########################## SORTED SETS ##########################
@@ -172,3 +172,48 @@ def geodist(info):
                 longitude2, latitude2 = decode(int(sorted_set[key][i][0]))
         return geohashGetDistance(longitude1, latitude1, longitude2, latitude2)
     return -1
+
+def convert_to_meters(radius: float, unit: str) -> float:
+    """Converts a radius value from a given unit to meters."""
+    unit = unit.lower()
+    if unit == "m":
+        return radius
+    elif unit == "km":
+        return radius * 1000.0
+    elif unit == "mi":
+        # 1 mile = 1609.344 meters (Redis constant)
+        return radius * 1609.344
+    elif unit == "ft":
+        # 1 foot = 0.3048 meters
+        return radius * 0.3048
+    else:
+        raise ValueError("Invalid unit specified")
+    
+
+def geomembers(key,center_lon,center_lat,search_radius_m):
+    # 2. Get all members in the GeoKey (Sorted Set)
+    if key not in sorted_set:
+        return []
+    members_scores = sorted_set.get(key, {}).items()
+
+    matching_members = []
+
+    # 3. Iterate, decode coordinates, and check distance
+    for member_name, score_float in members_scores:
+        try:
+            # Decode score to get location coordinates: returns (longitude, latitude)
+            member_lon, member_lat = decode(int(score_float))
+        except Exception:
+            # Skip member if decoding fails
+            continue
+
+        # Calculate distance between search center and member
+        distance = haversine_distance(
+            center_lon, center_lat, member_lon, member_lat
+        )
+
+        # Check if the member is within the search radius (distance <= radius in meters)
+        if distance <= search_radius_m:
+            matching_members.append(member_name)
+        
+    return matching_members

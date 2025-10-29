@@ -1,7 +1,7 @@
 from app.resp import resp_parser, resp_encoder, simple_string_encoder, error_encoder, array_encoder, parse_all
 from app.utils import getter, setter, rpush, lrange, lpush, llen, lpop, blpop, type_getter_lists, increment, store_rdb, keys
 from app.utils2 import xadd, type_getter_streams, xrange, xread, blocks_xread
-from app.utils3 import zadd, zrank, zrange, zcard, zscore, zrem, geoadd, geopos, geodist
+from app.utils3 import zadd, zrank, zrange, zcard, zscore, zrem, geoadd, geopos, geodist, convert_to_meters, geomembers
 from time import sleep
 import threading    
 
@@ -492,6 +492,55 @@ def cmd_executor(decoded_data, connection, config, queued, executing):
         response = resp_encoder(str(response))
         connection.sendall(response)
         return [], queued
+    
+    elif decoded_data[0].upper() == "GEOSEARCH":
+        # GEOSEARCH <key> FROMLONLAT <lon> <lat> BYRADIUS <radius> <unit>
+        key = decoded_data[1]
+        from_keyword = decoded_data[2].upper()
+        by_keyword = decoded_data[5].upper()
+
+        if from_keyword != "FROMLONLAT" or by_keyword != "BYRADIUS":
+            return b"-ERR syntax error\r\n"
+
+        try:
+            center_lon = float(decoded_data[3])
+            center_lat = float(decoded_data[4])
+            radius = float(decoded_data[6])
+            unit = decoded_data[7]
+        except ValueError:
+            return b"-ERR invalid coordinates or radius\r\n"
+
+        # 1. Convert radius to meters
+        try:
+            search_radius_m = convert_to_meters(radius, unit)
+        except ValueError:
+            return b"-ERR invalid unit specified\r\n"
+
+        matching_members = geomembers(key, center_lon, center_lat, search_radius_m)
+
+        if matching_members == []:
+            return b"*0\r\n"
+
+        # 4. Return matching members as a RESP Array (order does not matter)
+        response_parts = []
+        for member in matching_members:
+            member_bytes = member.encode()
+            response_parts.append(
+                b"$"
+                + str(len(member_bytes)).encode()
+                + b"\r\n"
+                + member_bytes
+                + b"\r\n"
+            )
+
+        response = (
+            b"*"
+            + str(len(matching_members)).encode()
+            + b"\r\n"
+            + b"".join(response_parts)
+        )
+        return response
+    
     # ERR
     else:
         response = error_encoder("ERR")
