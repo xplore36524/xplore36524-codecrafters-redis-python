@@ -194,12 +194,12 @@ def geomembers(key,center_lon,center_lat,search_radius_m):
     # 2. Get all members in the GeoKey (Sorted Set)
     if key not in sorted_set:
         return []
-    members_scores = sorted_set.get(key, {}).items()
+    members_scores = sorted_set[key]
 
     matching_members = []
 
     # 3. Iterate, decode coordinates, and check distance
-    for member_name, score_float in members_scores:
+    for score_float, member_name in members_scores:
         try:
             # Decode score to get location coordinates: returns (longitude, latitude)
             member_lon, member_lat = decode(int(score_float))
